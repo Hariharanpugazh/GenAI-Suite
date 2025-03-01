@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import ihubLogin from "@/assets/ihub-login.png";
 import { LoginForm } from "@/components/AuthCards/Login";
 import { SignUpForm } from "@/components/AuthCards/Signup";
@@ -65,17 +65,7 @@ const AuthPage = () => {
       <div className="flex flex-col gap-4 p-6 md:p-10 bg-white">
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-3xl pr-20">
-            {renderForm()}
-            {formType !== 'login' && (
-              <div className="text-center text-sm mt-4">
-                <button
-                  onClick={() => setFormType('login')}
-                  className="underline underline-offset-4"
-                >
-                  Back to Login
-                </button>
-              </div>
-            )}
+            {renderForm()}       
           </div>
         </div>
       </div>
