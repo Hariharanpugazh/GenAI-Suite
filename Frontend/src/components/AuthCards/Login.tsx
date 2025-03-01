@@ -5,8 +5,9 @@ import { Label } from "@/components/ui/label"
 
 export function LoginForm({
   className,
+  setFormType,
   ...props
-}: React.ComponentPropsWithoutRef<"form">) {
+}: React.ComponentPropsWithoutRef<"form"> & { setFormType: (formType: string) => void }) {
   return (
     <form className={cn("flex flex-col gap-6", className)} {...props}>
       <div className="flex flex-col items-center gap-2 text-center">
@@ -24,7 +25,7 @@ export function LoginForm({
           <div className="flex items-center">
             <Label htmlFor="password">Password</Label>
             <a
-              href="/forgot-password"
+              onClick={() => setFormType('forgotPassword')}
               className="ml-auto text-sm underline-offset-4 hover:underline"
             >
               Forgot your password?
@@ -38,7 +39,7 @@ export function LoginForm({
       </div>
       <div className="text-center text-sm">
         Don&apos;t have an account?{" "}
-        <a href="/signup" className="underline underline-offset-4">
+        <a onClick={() => setFormType('signup')} className="underline underline-offset-4">
           Sign up
         </a>
       </div>
