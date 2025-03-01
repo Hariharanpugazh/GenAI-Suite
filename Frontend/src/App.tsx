@@ -1,12 +1,12 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import VerifyCodePage from './pages/VerifyCodePage';
-import SetPasswordPage from './pages/SetPasswordPage';
-import Home from './pages/Home';
-import SignUpPage from './pages/signup-page';
-import ProductsList from './pages/ProductsList';
-import ProductsPage from './pages/ProductsPage';
+import LoginPage from './pages/Users/LoginPage';
+import ForgotPasswordPage from './pages/Users/ForgotPasswordPage';
+import VerifyCodePage from './pages/Users/VerifyCodePage';
+import SetPasswordPage from './pages/Users/SetPasswordPage';
+import Home from './pages/Users/Home';
+import SignUpPage from './pages/Users/signup-page';
+import ProductsList from './pages/Users/ProductsList';
+import ProductsPage from './pages/Users/ProductsPage';
 
 function App() {
   return (
@@ -20,7 +20,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/" element={<LoginPage />} />
           <Route path="/products-list" element={<ProductsList/>} />
-          <Route path="/product" element={<ProductsPage/>} />
+          <Route path="/  " element={<ProductsPage/>} />
         </Routes>
       </Router>
   );
