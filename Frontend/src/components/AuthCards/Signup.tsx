@@ -118,7 +118,7 @@ export function SignUpForm({
       </div>
       <div className="text-center text-sm">
         Already have an account?{" "}
-        <a onClick={() => setFormType("login")} className="text-blue-500 underline cursor-pointer">
+        <a onClick={() => setFormType("login")} className="cursor-pointer">
           Login
         </a>
       </div>
