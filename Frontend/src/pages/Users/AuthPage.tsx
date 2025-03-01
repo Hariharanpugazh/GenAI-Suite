@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import ihubLogin from "@/assets/ihub-login.png";
-import { LoginForm } from "@/components/login-form";
-import { SignUpForm } from "@/components/signup-form";
-import { ForgotPasswordForm } from "@/components/ForgotPasswordForm";
-import { VerifyCodeForm } from "@/components/VerifyCodeForm";
-import { SetPasswordForm } from "@/components/SetPasswordForm";
+import { LoginForm } from "@/components/AuthCards/Login";
+import { SignUpForm } from "@/components/AuthCards/Signup";
+import { ForgotPasswordForm } from "@/components/AuthCards/ForgotPasswordForm";
+import { VerifyCodeForm } from "@/components/AuthCards/Verification";
+import { SetPasswordForm } from "@/components/AuthCards/ResetPassword";
 import { useNavigate } from 'react-router-dom';
 
 const AuthPage = () => {
