@@ -113,6 +113,32 @@ def forgot_password(request):
         return Response({"error": str(e)}, status=500)
 
 @csrf_exempt
+@api_view(["POST"])
+def verify_reset_token(request):
+    try:
+        data = json.loads(request.body)
+        email = data.get("email")
+        token = data.get("token")
+
+        user = user_collection.find_one({"email": email})
+        if not user:
+            return JsonResponse({"error": "User not found"}, status=404)
+
+        stored_token = user.get("password_reset_token")
+        expiration_time = user.get("password_reset_expires")
+
+        if not stored_token or stored_token != token:
+            return JsonResponse({"error": "Invalid verification code"}, status=403)
+
+        if expiration_time and datetime.utcnow() > expiration_time:
+            return JsonResponse({"error": "Verification code expired"}, status=403)
+
+        return JsonResponse({"message": "Verification successful"}, status=200)
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
+    
+@csrf_exempt
 def reset_password(request):
     if request.method == "POST":
         try:
