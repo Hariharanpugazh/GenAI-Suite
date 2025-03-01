@@ -24,7 +24,7 @@ export function VerifyCodeForm({
           Verify
         </Button>
         <div className="text-center text-sm">
-          Didn't receive a code? <a href="/resend-code" className="underline underline-offset-4">Resend</a>
+          Didn't receive a code? <a className="underline underline-offset-4">Resend</a>
         </div>
       </div>
     </form>
