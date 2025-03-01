@@ -97,7 +97,7 @@ export function ForgotPasswordForm({
         <Button type="submit" className="w-full">{isCodeSent ? "Verify" : "Submit"}</Button>
       </div>
       <div className="text-center text-sm">
-        <a onClick={() => setFormType("login")} className="underline underline-offset-4 cursor-pointer">Back to login</a>
+        <a onClick={() => setFormType("login")} className="cursor-pointer">Back to Login</a>
       </div>
     </form>
   );
