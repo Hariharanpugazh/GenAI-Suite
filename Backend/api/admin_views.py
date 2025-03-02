@@ -1,6 +1,6 @@
 import jwt
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from django.http import JsonResponse
 from pymongo import MongoClient
 from django.contrib.auth.hashers import make_password, check_password
@@ -9,6 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from bson import ObjectId
+import base64
 
 # JWT Configuration
 JWT_SECRET = "secret"
@@ -20,6 +21,7 @@ db = client["GENAI"]
 user_collection = db["users"]
 admin_collection = db["admin"]
 superadmin_collection = db["superadmin"]
+products_collection = db["products"]
 
 # Generate JWT Token
 def generate_tokens(user_id, name, role):
@@ -154,3 +156,78 @@ def superadmin_login(request):
 
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
+        
+#===================================================P  R   O   D   U   C   T   S=====================================================================@csrf_exempt
+@csrf_exempt
+def post_product(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.POST.get("data", "{}"))  # Extract JSON data
+            demo_video = request.FILES.get("demo_video")
+            screenshot = request.FILES.get("screenshot")
+            thumbnail = request.FILES.get("thumbnail")
+
+            role = data.get("role")
+            userid = data.get("userId")
+
+            # Auto-approval logic for admin
+            auto_approval_setting = superadmin_collection.find_one({"key": "auto_approval"})
+            is_auto_approval = auto_approval_setting.get("value", False) if auto_approval_setting else False
+
+            # Determine if product is published
+            is_publish = True if role == "superadmin" or (role == "admin" and is_auto_approval) else None
+
+            # Validate required fields
+            required_fields = ["product_name", "product_description", "category"]
+            for field in required_fields:
+                if field not in data or not data[field].strip():
+                    return JsonResponse({"error": f"Missing required field: {field}"}, status=400)
+
+            # Convert uploaded files to Base64
+            def encode_file(file):
+                return base64.b64encode(file.read()).decode("utf-8") if file else None
+
+            # Extract user journey (up to 6) and product features (up to 8)
+            user_journey = []
+            for i in range(1, 7):  # Supports up to 6 journeys
+                journey_name = data.get(f"user_journey_{i}", "").strip()
+                journey_desc = data.get(f"user_journey_description_{i}", "").strip()
+                if journey_name and journey_desc:
+                    user_journey.append({"journey_name": journey_name, "journey_description": journey_desc})
+
+            product_features = []
+            for i in range(1, 9):  # Supports up to 8 product features
+                feature_name = data.get(f"product_feature_{i}", "").strip()
+                feature_desc = data.get(f"product_feature_description_{i}", "").strip()
+                if feature_name and feature_desc:
+                    product_features.append({"feature_name": feature_name, "feature_description": feature_desc})
+
+            product_data = {
+                "product_name": data["product_name"],
+                "product_description": data["product_description"],
+                "category": data["category"],
+                "demo_video": encode_file(demo_video),
+                "screenshot": encode_file(screenshot),
+                "thumbnail": encode_file(thumbnail),
+            }
+
+            product_entry = {
+                "user_id": userid,
+                "product_data": product_data,
+                "user_journey": user_journey,
+                "product_features": product_features,
+                "created_by": "admin_id" if role == "admin" else "superadmin_id",
+                "is_publish": is_publish,
+                "created_at": datetime.now(timezone.utc),
+                "updated_at": datetime.now(timezone.utc),
+            }
+
+            # Insert into MongoDB
+            products_collection.insert_one(product_entry)
+
+            return JsonResponse({"message": "Product created successfully, awaiting approval."}, status=200)
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method. Only POST is allowed."}, status=405)

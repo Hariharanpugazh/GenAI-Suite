@@ -18,4 +18,7 @@ urlpatterns = [
     #SUPERADMIN
     path("superadmin_signup/", superadmin_signup, name="superadmin_signup"),
     path("superadmin_login/",superadmin_login, name="superadmin_login"),
+
+    #PRODUCTS
+    path("post_product/", post_product, name="post_product"),
 ]
