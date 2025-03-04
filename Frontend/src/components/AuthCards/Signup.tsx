@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export function SignUpForm({
   className,
@@ -17,7 +18,24 @@ export function SignUpForm({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const [strength, setStrength] = useState(0);
+  const [passwordStrengthMessage, setPasswordStrengthMessage] = useState<string>("");
+  const [passwordMatchMessage, setPasswordMatchMessage] = useState<string>("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
+
+  useEffect(() => {
+    if (confirmPassword && password !== confirmPassword) {
+      setPasswordMatchMessage("Passwords do not match.");
+    } else {
+      setPasswordMatchMessage("");
+    }
+  }, [password, confirmPassword]);
+
+  useEffect(() => {
+    const isValid = !!(firstName && email && phone && password && confirmPassword && password === confirmPassword && passwordStrengthMessage === "Password is strong.");
+    setIsFormValid(isValid);
+  }, [firstName, email, phone, password, confirmPassword, passwordStrengthMessage]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -55,22 +73,25 @@ export function SignUpForm({
       } else {
         setError(data.error || "Error signing up.");
       }
-    } catch (err) {
+    } catch {
       setError("An error occurred. Please try again later.");
     }
   };
 
   const checkPasswordStrength = (password: string) => {
-    let strengthScore = 0;
-    if (password.length >= 6) strengthScore++;
-    if (password.match(/[A-Z]/)) strengthScore++;
-    if (password.match(/[a-z]/)) strengthScore++;
-    if (password.match(/[0-9]/)) strengthScore++;
-    if (password.match(/[@$!%*?&]/)) strengthScore++;
-    setStrength(strengthScore);
-  };
+    const requirements = [];
+    if (password.length < 6) requirements.push("at least 6 characters");
+    if (!password.match(/[A-Z]/)) requirements.push("an uppercase letter");
+    if (!password.match(/[a-z]/)) requirements.push("a lowercase letter");
+    if (!password.match(/[0-9]/)) requirements.push("a number");
+    if (!password.match(/[@$!%*?&]/)) requirements.push("a special character");
 
-  const strengthColors = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"];
+    if (requirements.length === 0) {
+      setPasswordStrengthMessage("Password is strong.");
+    } else {
+      setPasswordStrengthMessage(`Password must contain: ${requirements.join(", ")}`);
+    }
+  };
 
   return (
     <form className={cn("flex flex-col gap-6", className)} onSubmit={handleSubmit} {...props}>
@@ -86,11 +107,11 @@ export function SignUpForm({
         <div className="grid grid-cols-2 gap-4">
           <div className="grid gap-2">
             <Label htmlFor="firstName">First Name</Label>
-            <Input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Hari" required />
+            <Input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="First Name" required />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="lastName">Last Name (Optional)</Label>
-            <Input id="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Krish" />
+            <Input id="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Last Name" />
           </div>
         </div>
         <div className="grid gap-2">
@@ -101,18 +122,27 @@ export function SignUpForm({
           <Label htmlFor="phone">Phone Number</Label>
           <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="6382377127" required />
         </div>
-        <div className="grid gap-2">
+        <div className="grid gap-2 relative">
           <Label htmlFor="password">Password</Label>
-          <Input id="password" type="password" value={password} onChange={(e) => { setPassword(e.target.value); checkPasswordStrength(e.target.value); }} required />
-          <div className="w-full h-2 mt-2 bg-gray-300 rounded">
-            <div className="h-2 rounded" style={{ width: `${(strength / 5) * 100}%`, backgroundColor: strengthColors[strength - 1] || "gray" }}></div>
+          <div className="relative">
+            <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => { setPassword(e.target.value); checkPasswordStrength(e.target.value); }} required />
+            <span className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
+              {showPassword ? <FaEye /> : <FaEyeSlash />}
+            </span>
           </div>
+          <p className="text-sm text-gray-900">{passwordStrengthMessage}</p>
         </div>
-        <div className="grid gap-2">
+        <div className="grid gap-2 relative">
           <Label htmlFor="confirmPassword">Confirm Password</Label>
-          <Input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+          <div className="relative">
+            <Input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+            <span className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+              {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
+            </span>
+          </div>
+          <p className="text-sm text-grey-500">{passwordMatchMessage}</p>
         </div>
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full" disabled={!isFormValid}>
           Create account
         </Button>
       </div>

@@ -42,7 +42,7 @@ export function SetPasswordForm({
       } else {
         setError(data.error || "Error resetting password.");
       }
-    } catch (err) {
+    } catch  {
       setError("An error occurred. Please try again later.");
     }
   };

@@ -2,12 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ihubLogin from "@/assets/ihub-login.png";
 import Cookies from "js-cookie";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false); 
 
   const handleLogin = async () => {
     try {
@@ -28,8 +30,14 @@ const AdminLogin = () => {
       } else {
         setError(data.error || "Invalid login credentials");
       }
-    } catch (err) {
+    } catch  {
       setError("An error occurred. Please try again later.");
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleLogin();
     }
   };
 
@@ -47,36 +55,49 @@ const AdminLogin = () => {
       <div className="flex flex-col gap-4 p-6 md:p-10 bg-white">
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-3xl pr-20">
-            {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-            <h2 className="text-2xl font-bold mb-6">Login</h2>
+            <h2 className="text-2xl font-bold mb-2">Login</h2>
+            <h6 className="text-gray-500 text-sm mb-4">Login to access your travelwise account</h6>
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                onKeyDown={handleKeyDown}
+                className=" border rounded w-full py-2 px-3 text-gray-700 "
                 placeholder="example@gmail.com"
               />
+              
             </div>
             <div className="mb-6">
               <label className="block text-gray-700 text-sm font-bold mb-2">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                placeholder="Password"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="border rounded w-full py-2 px-3 text-gray-700 pr-10"
+                  placeholder="Password"
+                />
+                <span
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FaEye /> : <FaEyeSlash />}
+                </span>
+              </div>
+              
             </div>
             <div className="flex items-center justify-between">
               <button
                 onClick={handleLogin}
-                className="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+                className="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded w-full"
               >
                 Login
               </button>
             </div>
+            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
           </div>
         </div>
       </div>

@@ -36,7 +36,7 @@ export function ForgotPasswordForm({
       } else {
         setError(data.error || "Error sending verification code.");
       }
-    } catch (err) {
+    } catch  {
       setError("An error occurred. Please try again later.");
     }
   };
@@ -59,7 +59,7 @@ export function ForgotPasswordForm({
       } else {
         setError(data.error || "Invalid verification code");
       }
-    } catch (err) {
+    } catch  {
       setError("An error occurred. Please try again later.");
     }
   };
