@@ -42,7 +42,7 @@ const SuperadminSidebar: React.FC = () => {
         </button>
       </div>
     </div>
-  );
+  ); 
 };
 
 export default SuperadminSidebar;
