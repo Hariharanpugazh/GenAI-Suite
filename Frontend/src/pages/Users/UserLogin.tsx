@@ -5,6 +5,7 @@ import { ForgotPasswordForm } from "@/components/AuthCards/ForgotPasswordForm";
 import { SetPasswordForm } from "@/components/AuthCards/ResetPassword";
 import ihubLogin from "@/assets/ihub-login.png";
 import Cookies from "js-cookie";
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import eye icons
 
 const UserLogin = () => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ const UserLogin = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isNewUser, setIsNewUser] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
 
   const handleLogin = async () => {
     try {
@@ -35,8 +37,19 @@ const UserLogin = () => {
       } else {
         setError(data.error || "Invalid login credentials");
       }
-    } catch (err) {
+    } catch {
       setError("An error occurred. Please try again later.");
+    }
+  };
+
+  const cleanupLocalStorage = () => {
+    localStorage.removeItem("reset_email");
+    localStorage.removeItem("reset_token");
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Enter") {
+      handleLogin();
     }
   };
 
@@ -47,51 +60,62 @@ const UserLogin = () => {
 
     switch (formType) {
       case "login":
+        cleanupLocalStorage(); // Clear local storage when navigating to login
         return (
-          <div>
-            <h2 className="text-2xl font-bold mb-6">Login</h2>
+          <div onKeyDown={handleKeyDown}>
+            <h2 className="text-2xl font-bold mb-2">Login</h2>
+            <h6 className="text-gray-500 text-sm mb-4">Login to access your travelwise account</h6>
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="border rounded w-full py-2 px-3 text-gray-700"
                 placeholder="example@gmail.com"
               />
+              {error && error.includes("email") && <p className="text-red-500 text-sm mt-1">{error}</p>}
             </div>
-            <div className="mb-6">
+            <div className="mb-6 relative">
               <label className="block text-gray-700 text-sm font-bold mb-2">Password</label>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="border rounded w-full py-2 px-3 text-gray-700"
                 placeholder="Password"
               />
-            </div>
-            <div className="flex items-center justify-between">
-              <button
-                onClick={handleLogin}
-                className="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+              <span
+                className="absolute right-3 top-10 cursor-pointer"
+                onClick={() => setShowPassword(!showPassword)}
               >
-                Login
-              </button>
+                {showPassword ? <FaEye /> : <FaEyeSlash />}
+              </span>
+              {error && error.includes("password") && <p className="text-red-500 text-sm mt-1">{error}</p>}
             </div>
-            <div className="mt-4 text-center">
+            <div className="mb-4 text-right">
               <a
                 onClick={() => setFormType("forgotPassword")}
-                className="text-gray-500 hover:text-gray-700 cursor-pointer"
+                className="text-[#4A90E7] cursor-pointer"
               >
                 Forgot your password?
               </a>
             </div>
+            <div className="flex items-center justify-between">
+              <button
+                onClick={handleLogin}
+                className="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded w-full"
+              >
+                Login
+              </button>
+            </div>
+
             <div className="mt-4 text-center">
               <a
                 onClick={() => setFormType("signup")}
                 className="text-gray-500 hover:text-gray-700 cursor-pointer"
               >
-                Don't have an account? Sign up
+                Don't have an account? <span className="text-[#4A90E7]">Sign up</span>
               </a>
             </div>
           </div>
@@ -121,9 +145,12 @@ const UserLogin = () => {
       <div className="flex flex-col gap-4 p-6 md:p-10 bg-white">
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-3xl pr-20">
-            {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
             {isNewUser && <p className="text-blue-500 text-sm mb-4">New user detected. Please sign up.</p>}
             {renderForm()}
+            {error && !error.includes("email") && !error.includes("password") && (
+              <p className="text-red-500 text-sm mb-4">{error}</p>
+            )}
           </div>
         </div>
       </div>
