@@ -5,6 +5,8 @@ import { Navbar } from "@/components/Navbar"
 import { FeaturedProducts } from "@/components/FeaturedProducts"
 import ScrollProgress from "@/components/ui/scroll-progress"
 import CultureDiagram from "@/components/CultureDiagram"
+import { WhyChooseUs } from "@/components/WhyChooseUs"
+import { AnimatedBeamDemo } from "@/components/AnimatedBeamDemo"
 
 function Home() {
   return (
@@ -12,7 +14,9 @@ function Home() {
       <ScrollProgress className="top-[82px]" />
       <Navbar/>
       <Hero/>
+      <WhyChooseUs/>
       <CultureDiagram />
+      <AnimatedBeamDemo /> 
       <FeaturedProducts/>
       <IndustryVerticals/>
       <Footer/>

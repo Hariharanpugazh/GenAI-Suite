@@ -1,5 +1,10 @@
 import React from 'react';
-import { Brain, LightbulbIcon as LightbulbGear, RotateCcw } from 'lucide-react';
+import wcu1 from '../assets/wcu1.svg';
+import wcu2 from '../assets/wcu2.svg';
+import wcu3 from '../assets/wcu3.svg';
+import wcu4 from '../assets/wcu4.svg';
+import wcu5 from '../assets/wcu5.svg';
+import wcu6 from '../assets/wcu6.svg';
 
 interface FeatureCardProps {
   icon: React.ReactNode;
@@ -9,7 +14,7 @@ interface FeatureCardProps {
 
 const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description }) => (
   <div className="bg-white rounded-lg p-8 shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
-    <div className="inline-flex p-3 rounded-2xl border-2 border-gray-200 mb-6">
+    <div className="inline-flex p-3 rounded-2xl border-2 border-black mb-6 bg-[#f1f1f1]">
       {icon}
     </div>
     <h3 className="text-xl font-medium mb-3">{title}</h3>
@@ -20,19 +25,34 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description }) =
 export const WhyChooseUs: React.FC = () => {
   const features = [
     {
-      icon: <Brain className="w-8 h-8" />,
-      title: "Adaptive Intelligence",
-      description: "Haggle down the pub off his nut arse bog bits and bobs bugger."
+      icon: <img src={wcu1} alt="AI-Powered Products" className="w-8 h-8" />,
+      title: "AI-Powered Products",
+      description: "Advanced AI-driven solutions to enhance efficiency and innovation."
     },
     {
-      icon: <LightbulbGear className="w-8 h-8" />,
-      title: "Unified Innovation Engine",
-      description: "Driving smarter solutions with precision and productivity"
+      icon: <img src={wcu2} alt="Custom AI Solution" className="w-8 h-8" />,
+      title: "Custom AI Solution",
+      description: "Tailored AI models designed to fit your unique business needs."
     },
     {
-      icon: <RotateCcw className="w-8 h-8" />,
-      title: "Agility Driven",
-      description: "Offering flexibility that scales with the business."
+      icon: <img src={wcu3} alt="Cloud & Data Engineering" className="w-8 h-8" />,
+      title: "Cloud & Data Engineering",
+      description: "Tailored AI models designed to fit your unique business needs."
+    },
+    {
+      icon: <img src={wcu4} alt="Consulting and Training" className="w-8 h-8" />,
+      title: "Consulting and Training",
+      description: "Expert guidance to implement, optimize, and scale AI solutions."
+    },
+    {
+      icon: <img src={wcu5} alt="End-to-End Product Development" className="w-8 h-8" />,
+      title: "End-to-End Product Development",
+      description: "From ideation to deployment, we build future-ready AI products."
+    },
+    {
+      icon: <img src={wcu6} alt="Innovation-Driven Approach" className="w-8 h-8" />,
+      title: "Innovation-Driven Approach",
+      description: "Harnessing cutting-edge AI and technology to drive scalable, intelligent solutions."
     }
   ];
 
@@ -44,7 +64,7 @@ export const WhyChooseUs: React.FC = () => {
           choose us?
         </span>
       </h2>
-      
+
       <p className="text-center text-gray-600 mb-12">
         From multipurpose themes to niche templates
       </p>
@@ -53,11 +73,7 @@ export const WhyChooseUs: React.FC = () => {
         {features.map((feature, index) => (
           <FeatureCard key={index} {...feature} />
         ))}
-        {features.map((feature, index) => (
-          <FeatureCard key={`repeat-${index}`} {...feature} />
-        ))}
       </div>
     </section>
   );
 };
-
