@@ -15,7 +15,7 @@ import {
 } from "@/components/Chatbot/expandable-chat"
 import { ChatMessageList } from "@/components/Chatbot/chat-message-list"
 
-export function ExpandableChatDemo() {
+export default function Chatbot() {
   const [messages, setMessages] = useState([
     {
       id: 1,

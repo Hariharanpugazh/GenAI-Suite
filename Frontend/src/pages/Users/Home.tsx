@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar"
 import { FeaturedProducts } from "@/components/FeaturedProducts"
 import ScrollProgress from "@/components/ui/scroll-progress"
 import CultureDiagram from "@/components/CultureDiagram"
+import Chatbot from "@/pages/Users/Chatbot"; // Import the Chatbot component
 
 function Home() {
   return (
@@ -16,6 +17,7 @@ function Home() {
       <FeaturedProducts/>
       <IndustryVerticals/>
       <Footer/>
+      <Chatbot /> 
     </>
   )
 }

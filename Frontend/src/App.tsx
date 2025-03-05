@@ -14,7 +14,6 @@ import Products from './pages/Superadmin/Products.tsx';
 import PostProduct from './pages/Superadmin/PostProduct.tsx';
 import AdminDashboard from './pages/Admin/AdminDashboard.tsx';
 import AdminProjects from './pages/Admin/AdminProjects.tsx';
-import { ExpandableChatDemo } from './pages/Users/Chatbot.tsx';
 
 
 function App() {
@@ -39,9 +38,6 @@ function App() {
           <Route path="/superadmin-dashboard" element={<SuperadminDashboard />} />
           <Route path="/products" element={<Products />} />
           <Route path="/post-product" element={<PostProduct />} />
-
-          {/* Chatbot */}
-          <Route path="/chatbot" element={<ExpandableChatDemo />} />
 
         </Routes>
       </Router>
