@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import *
 from .admin_views import *
+from .chatbot_views import *
 
 urlpatterns = [
 
@@ -23,4 +24,8 @@ urlpatterns = [
     #PRODUCTS
     path("post_product/", post_product, name="post_product"),
     path('get-all-products/',get_all_products, name="get_all_products"),
+    
+    #CHATBOT
+    path("chat/", chatbot_view, name="chatbot"),
+    path("event/", create_google_calendar_event, name="create_google_calendar_event"),
 ]

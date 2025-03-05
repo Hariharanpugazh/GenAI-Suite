@@ -1,0 +1,37 @@
+{
+    "innovation_center": {
+      "name": "SNS Innovation-HUB (sns IHUB)",
+      "description": "Incubate your ideas at SNS! SNS iHub is an initiative by SNS Institutions to foster startups by providing a prototyping space immersed in an ambience of creativity and design thinking. The center helps to identify societal/industrial needs and solve them using a design thinking approach, mentored by experts from academia and industry. Inputs on thrust areas provide the right ecosystem for business transformation and lead towards the desired growth.",
+      "facilities": [
+        {
+          "title": "SNS IBI LIQUID STUDIO",
+          "description": "As an outcome of an Ideathon – Hackathon event, winning innovative projects are set to display as a prototype and product in our SNS IBI LIQUID STUDIO. It is evolving as a prime space, and the budding engineers deem it a privilege if their projects get shortlisted for display."
+        },
+        {
+          "title": "I-TECH LABS (AR /VR, AI, DS, AM)",
+          "description": "The ‘iTech Labs’ are an inter-disciplinary research space dedicated to ideating and developing innovative solutions for pressing problems. The iHub team supports incubates with technological access to those who are passionate about problem-solving and commercializing their ideas. The iHub team works incessantly under the five dedicated innovation labs: AR/VR, Internet of Things, Artificial Intelligence, Machine Learning, Robotics and Automation, and Additive Manufacturing."
+        },
+        {
+          "title": "SNS-TI INNOVATION LAB",
+          "description": "SNS-TI innovation lab is an initiative by Steps Knowledge Services, Coimbatore, in collaboration with Texas Instruments, Bangalore. It is a Design House catering to design, development, production, and transfer of technology for new Products Development and Engineering of Special Purpose Machines (SPM), End of Line Testers, Quality Inspectors, and Functional Testers for various industrial verticals."
+        },
+        {
+          "title": "BOT LAB",
+          "description": "The 'Bot Lab', in association with Automation Anywhere University, established Coimbatore’s first Centre-of-Excellence in the field of Robotics Process Automation (BOT Lab), which provides our students with level 2 training and placement opportunities."
+        },
+        {
+          "title": "PISTON FACTORY",
+          "description": "The 'Piston Factory', a lounge, serves a purpose for the students who are involved in real-time project works as well as fabricating vehicles for attending various competitions conducted in different parts of the country."
+        },
+        {
+          "title": "PF 1",
+          "description": "It is a factory by interns"
+        },
+        {
+          "title": "SNS V-ALIENZ PRODUCT DESIGN STUDIO",
+          "description": "The joint venture V- Alienz SNS Product Design Studio, developed by the Centre for Creativity and Department of Mechanical Engineering, jointly inaugurated a novel initiative 'Company on Campus' to foster new product development."
+        }
+      ]
+    }
+  }
+  
