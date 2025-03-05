@@ -25,8 +25,8 @@ def generate_tokens(user_id, name, role):
         "id": str(user_id),
         "name": name,
         "role": role,  # Store role in JWT
-        "exp": (datetime.utcnow() + timedelta(hours=10)).timestamp(),
-        "iat": datetime.utcnow().timestamp(),
+        "exp": (datetime.now() + timedelta(hours=10)).timestamp(),
+        "iat": datetime.now().timestamp(),
     }
     token = jwt.encode(access_payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return {"jwt": token}
@@ -58,7 +58,7 @@ def user_signup(request):
                 "email": email,
                 "phone_number": phone,
                 "password": hashed_password,
-                "created_at": datetime.utcnow(),
+                "created_at": datetime.now(),
                 "last_login": None,
             }
 
@@ -81,7 +81,7 @@ def user_login(request):
                 return JsonResponse({"error": "Email not found"}, status=404)
 
             if check_password(password, user["password"]):
-                user_collection.update_one({"email": email}, {"$set": {"last_login": datetime.utcnow()}})
+                user_collection.update_one({"email": email}, {"$set": {"last_login": datetime.now()}})
                 tokens = generate_tokens(user["_id"], user["first_name"], "user")
                 return JsonResponse({"message": "Login successful", "token": tokens}, status=200)
             else:
@@ -101,7 +101,7 @@ def forgot_password(request):
             return Response({"error": "Email not found"}, status=400)
 
         reset_token = str(ObjectId())[:6]  # Generate a random reset token
-        expiration_time = datetime.utcnow() + timedelta(hours=1)
+        expiration_time = datetime.now() + timedelta(hours=1)
 
         user_collection.update_one(
             {"email": email},
@@ -130,7 +130,7 @@ def verify_reset_token(request):
         if not stored_token or stored_token != token:
             return JsonResponse({"error": "Invalid verification code"}, status=403)
 
-        if expiration_time and datetime.utcnow() > expiration_time:
+        if expiration_time and datetime.now() > expiration_time:
             return JsonResponse({"error": "Verification code expired"}, status=403)
 
         return JsonResponse({"message": "Verification successful"}, status=200)

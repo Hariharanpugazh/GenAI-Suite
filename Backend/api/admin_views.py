@@ -11,7 +11,6 @@ from rest_framework.response import Response
 from bson import ObjectId
 import requests
 import base64
-from moviepy import VideoFileClip
 import tempfile
 import os , subprocess
 import traceback , gridfs
@@ -34,8 +33,8 @@ def generate_tokens(user_id, name, role):
         "id": str(user_id),
         "name": name,
         "role": role,  # Store role in JWT
-        "exp": (datetime.utcnow() + timedelta(hours=10)).timestamp(),
-        "iat": datetime.utcnow().timestamp(),
+        "exp": (datetime.now() + timedelta(hours=10)).timestamp(),
+        "iat": datetime.now().timestamp(),
     }
     token = jwt.encode(access_payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return {"jwt": token}
@@ -69,7 +68,7 @@ def admin_signup(request):
                 "phone_number": phone,
                 "password": hashed_password,
                 "role": "admin",
-                "created_at": datetime.utcnow(),
+                "created_at": datetime.now(),
                 "last_login": None,
             }
 
@@ -92,7 +91,7 @@ def admin_login(request):
                 return JsonResponse({"error": "Email not found"}, status=404)
 
             if check_password(password, admin["password"]):
-                admin_collection.update_one({"email": email}, {"$set": {"last_login": datetime.utcnow()}})
+                admin_collection.update_one({"email": email}, {"$set": {"last_login": datetime.now()}})
                 tokens = generate_tokens(admin["_id"], admin["first_name"], "admin")
                 return JsonResponse({"message": "Login successful", "token": tokens}, status=200)
             else:
@@ -130,7 +129,7 @@ def superadmin_signup(request):
                 "phone_number": phone,
                 "password": hashed_password,
                 "role": "superadmin",
-                "created_at": datetime.utcnow(),
+                "created_at": datetime.now(),
                 "last_login": None,
             }
 
@@ -153,7 +152,7 @@ def superadmin_login(request):
                 return JsonResponse({"error": "Email not found"}, status=404)
 
             if check_password(password, superadmin["password"]):
-                superadmin_collection.update_one({"email": email}, {"$set": {"last_login": datetime.utcnow()}})
+                superadmin_collection.update_one({"email": email}, {"$set": {"last_login": datetime.now()}})
                 tokens = generate_tokens(superadmin["_id"], superadmin["first_name"], "superadmin")
                 return JsonResponse({"message": "Login successful", "token": tokens}, status=200)
             else:
@@ -272,7 +271,7 @@ def post_product(request):
 
     return JsonResponse({"error": "Invalid request method. Only POST is allowed."}, status=405)
 
-
+#Uploaded file will be stored in third-part website ( Go File )
 
 API_TOKEN = "I9bJJd3bM0RKonahK6wSM7IHhQjSMgo7" #sns innovation hub id acc
 HEADERS = {"Authorization": f"Bearer {API_TOKEN}"}
@@ -481,14 +480,14 @@ def review_product(request, product_id):
         if action == "approve":
             products_collection.update_one(
                 {"_id": ObjectId(product_id)},
-                {"$set": {"is_publish": True, "updated_at": datetime.utcnow()}}
+                {"$set": {"is_publish": True, "updated_at": datetime.now()}}
             )
             return Response({"message": "Product approved and published successfully"}, status=200)
 
         elif action == "reject":
             products_collection.update_one(
                 {"_id": ObjectId(product_id)},
-                {"$set": {"is_publish": False, "updated_at": datetime.utcnow()}}
+                {"$set": {"is_publish": False, "updated_at": datetime.now()}}
             )
             return Response({"message": "Product rejected successfully"}, status=200)
 
