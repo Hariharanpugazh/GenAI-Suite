@@ -20,6 +20,8 @@ urlpatterns = [
     #SUPERADMIN
     path("superadmin_signup/", superadmin_signup, name="superadmin_signup"),
     path("superadmin_login/",superadmin_login, name="superadmin_login"),
+    path('get-all-products/',get_all_products, name='get_all_products'),
+    path("review-product/<str:product_id>/", review_product, name="review_product"),
 
     #PRODUCTS
     path("post_product/", post_product, name="post_product"),
