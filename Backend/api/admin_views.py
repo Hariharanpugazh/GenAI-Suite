@@ -232,6 +232,74 @@ def post_product(request):
 
     return JsonResponse({"error": "Invalid request method. Only POST is allowed."}, status=405)
 
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_all_products(request):
+    try:
+        # Fetch only products that are published (is_publish=True)
+        products_collection = db["products"]
+        products = list(products_collection.find({}, {"_id": 1, "user_id": 1, "product_data": 1, "is_publish": 1, "created_at": 1}))
+
+        # Convert `_id` to string
+        for product in products:
+            product["_id"] = str(product["_id"])
+
+        return Response({"products": products}, status=200)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+    
+@csrf_exempt
+@api_view(["POST"])
+def review_product(request, product_id):
+    try:
+        # Extract JWT token from request headers
+        token = request.headers.get("Authorization", "").split("Bearer ")[-1]
+        if not token:
+            return Response({"error": "Authorization token required"}, status=401)
+
+        # Decode JWT token
+        try:
+            decoded_token = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+            user_role = decoded_token.get("role")
+        except jwt.ExpiredSignatureError:
+            return Response({"error": "Token has expired"}, status=401)
+        except jwt.InvalidTokenError:
+            return Response({"error": "Invalid token"}, status=401)
+
+        # Ensure the user is a Superadmin
+        if user_role != "superadmin":
+            return Response({"error": "Unauthorized"}, status=403)
+
+        # Get the action (approve/reject) from request body
+        data = json.loads(request.body)
+        action = data.get("action")
+        if action not in ["approve", "reject"]:
+            return Response({"error": "Invalid action"}, status=400)
+
+        # Check if the product exists
+        product = products_collection.find_one({"_id": ObjectId(product_id)})
+        if not product:
+            return Response({"error": "Product not found"}, status=404)
+
+        # Approve or Reject Product
+        if action == "approve":
+            products_collection.update_one(
+                {"_id": ObjectId(product_id)},
+                {"$set": {"is_publish": True, "updated_at": datetime.utcnow()}}
+            )
+            return Response({"message": "Product approved and published successfully"}, status=200)
+
+        elif action == "reject":
+            products_collection.update_one(
+                {"_id": ObjectId(product_id)},
+                {"$set": {"is_publish": False, "updated_at": datetime.utcnow()}}
+            )
+            return Response({"message": "Product rejected successfully"}, status=200)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
 @csrf_exempt
 @api_view(["GET"])
 def get_admin_products(request):
