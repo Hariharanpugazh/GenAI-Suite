@@ -231,3 +231,37 @@ def post_product(request):
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "Invalid request method. Only POST is allowed."}, status=405)
+
+@csrf_exempt
+@api_view(["GET"])
+def get_admin_products(request):
+    try:
+        # Extract JWT token from request headers
+        token = request.headers.get("Authorization", "").split("Bearer ")[-1]
+        if not token:
+            return Response({"error": "Authorization token required"}, status=401)
+
+        # Decode JWT token
+        try:
+            decoded_token = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+            admin_id = decoded_token.get("id")
+            role = decoded_token.get("role")
+        except jwt.ExpiredSignatureError:
+            return Response({"error": "Token has expired"}, status=401)
+        except jwt.InvalidTokenError:
+            return Response({"error": "Invalid token"}, status=401)
+
+        # Ensure the user is an admin
+        if role != "admin":
+            return Response({"error": "Unauthorized"}, status=403)
+
+        # Fetch products created by this admin
+        products = list(products_collection.find({"user_id": admin_id}, {"_id": 0}))
+
+        if not products:
+            return Response({"message": "No products found"}, status=200)
+
+        return Response({"products": products}, status=200)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)

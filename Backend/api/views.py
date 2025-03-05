@@ -172,3 +172,23 @@ def reset_password(request):
             return JsonResponse({"error": str(e)}, status=400)
 
     return JsonResponse({"error": "Invalid request method"}, status=400)
+
+#==================================================================PRODUCTS===================================================================
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_all_products(request):
+    try:
+        # Connect to the "products" collection
+        products_collection = db["products"]
+        
+        # Fetch only published products (is_publish=True)
+        products = list(products_collection.find({"is_publish": True}, {"_id": 0}))  # Exclude MongoDB ObjectId
+        
+        if not products:
+            return Response({"message": "No published products found"}, status=200)
+        
+        return Response({"products": products}, status=200)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+

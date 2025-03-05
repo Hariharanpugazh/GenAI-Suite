@@ -14,6 +14,7 @@ urlpatterns = [
     #ADMIN
     path("admin_signup/", admin_signup, name="admin_signup"),
     path("admin_login/",admin_login, name="admin_login"),
+    path("get-admin-products/", get_admin_products, name="get_admin_products"),
 
     #SUPERADMIN
     path("superadmin_signup/", superadmin_signup, name="superadmin_signup"),
@@ -21,4 +22,5 @@ urlpatterns = [
 
     #PRODUCTS
     path("post_product/", post_product, name="post_product"),
+    path('get-all-products/',get_all_products, name="get_all_products"),
 ]

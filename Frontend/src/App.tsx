@@ -13,6 +13,7 @@ import SuperadminDashboard from './pages/Superadmin/SuperadminDashboard.tsx';
 import Products from './pages/Superadmin/Products.tsx';
 import PostProduct from './pages/Superadmin/PostProduct.tsx';
 import AdminDashboard from './pages/Admin/AdminDashboard.tsx';
+import AdminProjects from './pages/Admin/AdminProjects.tsx';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
           {/* Admin */}
           <Route path='/admin_login' element={<AdminLogin />} />
           <Route path='/admin-dashboard' element={<AdminDashboard />} />
+          <Route path='/admin/products' element={<AdminProjects />} />
           {/* SuperAdmin */}
           <Route path="/superadmin_login" element={<SuperAdminLogin />} />
           <Route path="/superadmin-dashboard" element={<SuperadminDashboard />} />
