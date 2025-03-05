@@ -1,0 +1,859 @@
+[
+  {
+    "type": "metadata",
+    "description": "This file contains metadata about the product catalog.",
+    "number_of_products": 2,
+    "product_names": [
+      "Center for Competitive Exams",
+      "Assessment Platform"
+    ]
+  },
+  {
+    "type": "product",
+    "name": "Center for Competitive Exams",
+    "product_type": "Application",
+    "description": "A centralized web and mobile platform managed by college institutions to provide students with reliable information about competitive exams, job openings, and internship opportunities. Faculty members can post verified listings, which are reviewed and approved by the super admin before publication. The platform ensures students do not miss important deadlines and have access to career resources, company insights, and study materials to make informed career decisions."
+  },
+  {
+    "type": "product",
+    "name": "Assessment Platform",
+    "product_type": "Application",
+    "description": "A comprehensive platform designed to streamline the assessment process for educational institutions. It includes features for creating, managing, and monitoring tests, as well as proctoring tools to ensure test integrity. The platform is designed to be user-friendly for both staff and students, providing detailed analytics and reports to track performance and engagement."
+  },
+  {
+    "type": "design_thinking",
+    "product": "Center for Competitive Exams",
+    "framework": "Empathize",
+    "description": "Students often struggle to find credible job opportunities and internships due to scattered information across multiple sources. They may miss deadlines, lack proper guidance, or struggle with application procedures. Faculty members require a structured system to share verified job openings while ensuring institutional credibility."
+  },
+  {
+    "type": "design_thinking",
+    "product": "Center for Competitive Exams",
+    "framework": "Define",
+    "description": "A digital solution is required to centralize career opportunities and study materials while maintaining an approval workflow to ensure authenticity and quality."
+  },
+  {
+    "type": "design_thinking",
+    "product": "Center for Competitive Exams",
+    "framework": "Ideate",
+    "description": "A role-based platform where faculty members can post verified opportunities, super admins oversee approvals, and students access structured listings with job descriptions, salary insights, and application deadlines."
+  },
+  {
+    "type": "design_thinking",
+    "product": "Center for Competitive Exams",
+    "framework": "Prototype",
+    "description": "A fully functional career portal that categorizes jobs and internships, integrates study materials for exam preparation, and provides notifications to students about new postings and deadlines."
+  },
+  {
+    "type": "design_thinking",
+    "product": "Center for Competitive Exams",
+    "framework": "Test",
+    "description": "Regular feedback from students and faculty will be gathered to refine user experience, improve features, and ensure students maximize their career opportunities."
+  },
+  {
+    "type": "benefits",
+    "product": "Center for Competitive Exams",
+    "role": "students",
+    "description": "Gain access to a structured and verified database of job opportunities, internships, and study materials. Receive real-time notifications about deadlines, explore company profiles, and track applications efficiently."
+  },
+  {
+    "type": "benefits",
+    "product": "Center for Competitive Exams",
+    "role": "faculty",
+    "description": "Easily post job and internship listings while ensuring that students receive credible and relevant opportunities. Monitor student engagement with postings and study materials."
+  },
+  {
+    "type": "benefits",
+    "product": "Center for Competitive Exams",
+    "role": "institutions",
+    "description": "Improve student placement rates by providing a dedicated career platform that fosters professional growth, skill development, and better employment opportunities."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "super_admin",
+    "feature": "full_platform_access",
+    "description": "Super Admins have unrestricted control over the platform, managing all aspects, including user roles, content approvals, and security settings.",
+    "benefit": "Ensures that the system runs smoothly while maintaining security and integrity."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "super_admin",
+    "feature": "admin_account_management",
+    "description": "Create, edit, and remove admin accounts to manage platform functionalities efficiently.",
+    "benefit": "Allows for role-based access control, ensuring a structured workflow within the institution."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "super_admin",
+    "feature": "overall_job_listing_stats",
+    "description": "Gain complete access to all job and internship postings, along with statistical insights into engagement rates, applications, and student success metrics.",
+    "benefit": "Provides valuable data to improve job offerings and enhance student placement rates."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "super_admin",
+    "feature": "job_approval_system",
+    "description": "Review, approve, or reject job and internship postings submitted by faculty. Provide feedback on rejected postings to maintain listing quality.",
+    "benefit": "Ensures that students only access authentic and high-quality job opportunities."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "super_admin",
+    "feature": "student_verification_oversight",
+    "description": "Oversee the verification process of student accounts managed by admins to prevent unauthorized access.",
+    "benefit": "Protects the integrity of the platform and ensures only genuine students benefit from job listings."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "super_admin",
+    "feature": "platform_content_moderation",
+    "description": "Monitor, review, and approve all uploaded content, including study materials and job postings.",
+    "benefit": "Prevents misinformation, ensuring that all content is accurate, relevant, and institutionally approved."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "super_admin",
+    "feature": "monitor_admin_activities",
+    "description": "Track job postings, study material uploads, student approvals, and overall admin activities.",
+    "benefit": "Provides transparency, accountability, and improved governance of platform operations."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "super_admin",
+    "feature": "generate_reports_insights",
+    "description": "Generate analytical reports on student engagement, job application rates, and platform usage trends.",
+    "benefit": "Helps institutions refine their career services and better support students’ career growth."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "admin",
+    "feature": "admin_login_dashboard",
+    "description": "Secure admin login with a personalized dashboard displaying key platform metrics and functionalities.",
+    "benefit": "Enables efficient management of job postings, study materials, and student accounts."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "admin",
+    "feature": "job_categorization",
+    "description": "Classify job and internship postings based on industry, job role, and location for better searchability.",
+    "benefit": "Improves the user experience by making job searches faster and more relevant."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "admin",
+    "feature": "job_post_management",
+    "description": "Create, edit, and delete job and internship listings while ensuring that they contain accurate descriptions and application details.",
+    "benefit": "Keeps job postings up to date, providing students with reliable career opportunities."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "admin",
+    "feature": "study_material_management",
+    "description": "Upload, organize, and categorize study materials for competitive exams like TNPSC, Banking, and more.",
+    "benefit": "Helps students prepare effectively for competitive exams with easy access to learning resources."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "admin",
+    "feature": "content_approval",
+    "description": "Review and approve study materials before they are published on the platform.",
+    "benefit": "Ensures that students only access high-quality and institution-approved study materials."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "admin",
+    "feature": "achievement_management",
+    "description": "Post and update student achievements, including placement milestones and competitive exam successes.",
+    "benefit": "Motivates students and highlights the institution’s success in career placements."
+  },
+    {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "admin",
+    "feature": "student_account_management",
+    "description": "Verify and approve student registrations to ensure only eligible students access the platform.",
+    "benefit": "Maintains a controlled and secure environment for students."
+  },
+    {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "admin",
+    "feature": "monitor_student_engagement",
+    "description": "Track clicks, downloads, job applications, and other student activities to measure engagement levels.",
+    "benefit": "Provides insights into student behavior and helps improve content delivery."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "student",
+    "feature": "login_registration",
+    "description": "Secure and simple registration and login system for students.",
+    "benefit": "Ensures a seamless onboarding process and account security."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "student",
+    "feature": "dashboard_overview",
+    "description": "A central hub displaying job/internship listings, study materials, and notifications.",
+    "benefit": "Provides students with quick and easy access to all resources."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "student",
+    "feature": "categorized_job_listings",
+    "description": "Jobs are categorized based on industry, role, and location for efficient searching.",
+    "benefit": "Helps students quickly find relevant job opportunities."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "student",
+    "feature": "search_filters_jobs",
+    "description": "Advanced search and filter options for job postings.",
+    "benefit": "Allows students to refine their searches based on specific preferences."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "student",
+    "feature": "direct_application_redirection",
+    "description": "Provides external application links for students to apply directly to jobs and internships.",
+    "benefit": "Simplifies the application process and reduces manual effort."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "student",
+    "feature": "study_material_section",
+    "description": "A dedicated section for competitive exam preparation materials, including PDFs, videos, and guides.",
+    "benefit": "Provides structured learning resources to help students excel in exams."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "student",
+    "feature": "notifications",
+    "description": "Real-time alerts for job postings, study material uploads, and application deadlines.",
+    "benefit": "Ensures students never miss important updates or deadlines."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "student",
+    "feature": "saved_jobs_page",
+    "description": "A personal space where students can save and track job listings of interest.",
+    "benefit": "Helps students keep track of job opportunities they wish to revisit later."
+  },
+  {
+    "type": "role",
+    "product": "Center for Competitive Exams",
+    "role_name": "student",
+    "feature": "profile_management",
+    "description": "Students can update personal details, track applications, and manage their job preferences.",
+    "benefit": "Allows students to personalize their experience and monitor their job-seeking journey."
+  },
+  {
+    "type": "assessment_platform",
+    "feature": "uses",
+    "product": "Assessment Platform",
+    "description": "Efficient test creation and management for staff."
+  },
+  {
+    "type": "assessment_platform",
+    "feature": "uses",
+    "product": "Assessment Platform",
+    "description": "Real-time monitoring of test activity and student performance."
+  },
+  {
+    "type": "assessment_platform",
+    "feature": "uses",
+    "product": "Assessment Platform",
+    "description": "Enhanced test security through multiple proctoring features."
+  },
+  {
+    "type": "assessment_platform",
+    "feature": "uses",
+    "product": "Assessment Platform",
+    "description": "Detailed performance reports for students to track their progress."
+  },
+  {
+    "type": "assessment_platform",
+    "feature": "uses",
+    "product": "Assessment Platform",
+    "description": "User-friendly interface for students to access and take assessments."
+  },
+  {
+    "type": "design_thinking",
+    "product": "Assessment Platform",
+    "framework": "Empathize",
+    "description": "Understand the needs, challenges, and expectations of students, faculty, and administrators regarding assessment management.",
+    "methods": [
+        "User Interviews: Conduct sessions with students and staff to gather insights.",
+        "Surveys: Collect feedback on current challenges in exam management.",
+        "Observations: Study how assessments are conducted in different institutions."
+      ],
+    "benefits": [
+        "Ensures user needs are accurately captured.",
+        "Identifies pain points in existing assessment methods."
+    ]
+  },
+    {
+    "type": "design_thinking",
+    "product": "Assessment Platform",
+    "framework": "Define",
+    "description": "Clearly outline the core problems faced by users and set objectives for the platform.",
+    "problemStatements": [
+        "Students struggle to keep track of assessment schedules and deadlines.",
+        "Staff face challenges in managing and monitoring assessments efficiently.",
+        "Ensuring test integrity through proctoring is a major concern."
+    ],
+    "benefits": [
+        "Establishes a focused problem-solving approach.",
+        "Helps create a solution tailored to actual user problems."
+    ]
+  },
+    {
+    "type": "design_thinking",
+    "product": "Assessment Platform",
+    "framework": "Ideate",
+    "description": "Brainstorm potential solutions and innovative features for the application.",
+    "methods":[
+        "Wireframing: Create preliminary design concepts.",
+        "Feature Prioritization: Rank features based on user impact.",
+        "Collaborative Workshops: Engage stakeholders in idea generation."
+    ],
+    "benefits":[
+        "Encourages innovative approaches to assessment management.",
+        "Leads to well-structured and user-friendly features."
+    ]
+  },
+   {
+    "type": "design_thinking",
+    "product": "Assessment Platform",
+    "framework": "Prototype",
+    "description": "Develop interactive mockups and test early-stage designs.",
+    "methods":[
+        "Low-Fidelity Prototypes: Sketch initial concepts for feedback.",
+        "High-Fidelity Prototypes: Build clickable designs for usability testing.",
+        "User Testing: Gather feedback on prototype interactions."
+    ],
+    "benefits":[
+        "Identifies usability issues early.",
+        "Saves development time by refining features before full implementation."
+    ]
+  },
+  {
+    "type": "design_thinking",
+    "product": "Assessment Platform",
+    "framework": "Test",
+    "description": "Validate the final product with users and iterate based on feedback.",
+    "methods":[
+        "Beta Testing: Deploy the platform to a limited group of students and staff.",
+        "Performance Evaluation: Analyze system performance under different loads.",
+        "Iterative Improvements: Continuously refine the platform based on feedback."
+    ],
+    "benefits":[
+        "Ensures a well-optimized and user-friendly product.",
+        "Improves adoption by addressing user concerns before full deployment."
+    ]
+  },
+  {
+    "type": "staff_portal",
+    "product": "Assessment Platform",
+    "section": "StatisticsDashboard",
+    "description": "View key statistics related to tests and students."
+  },
+  {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "StatisticsDashboard",
+    "feature": "TotalTestsCreated",
+    "description": "Displays the number of tests created by the logged-in staff member.",
+    "benefits": [
+      "Easy tracking of created assessments",
+      "Monitor test creation trends"
+    ]
+  },
+    {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "StatisticsDashboard",
+    "feature": "TotalStudents",
+    "description": "Displays the number of students registered under the staff's oversight.",
+    "benefits": [
+      "Provides an overview of student engagement",
+      "Helps in student performance analysis"
+    ]
+  },
+      {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "StatisticsDashboard",
+    "feature": "LiveTests",
+    "description": "Displays the number of ongoing tests.",
+    "benefits": [
+      "Real-time monitoring of test activity"
+    ]
+  },
+      {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "StatisticsDashboard",
+    "feature": "CompletedTests",
+    "description": "Displays the number of tests that have been completed.",
+    "benefits": [
+      "Analyzing completion rates and performance trends"
+    ]
+  },
+        {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "StatisticsDashboard",
+    "feature": "UpcomingTests",
+    "description": "Displays the number of scheduled tests.",
+    "benefits": [
+      "Efficient planning of assessments"
+    ]
+  },
+  {
+    "type": "staff_portal",
+    "product": "Assessment Platform",
+    "section": "TestManagement",
+    "description": "Manage and organize tests with search and filter options."
+  },
+  {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "TestManagement",
+    "feature": "CategorizedView",
+    "description": "Tests are displayed under categories: All, Live, Completed, and Upcoming.",
+    "benefits": [
+      "Easy access to test status",
+      "Efficient test organization"
+    ]
+  },
+    {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "TestManagement",
+    "feature": "SearchByName",
+    "description": "Search tests by name for quick access.",
+    "benefits": [
+      "Saves time in locating specific tests"
+    ]
+  },
+    {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "TestManagement",
+    "feature": "StatusLabels",
+    "description": "Tags such as Upcoming and Live are displayed for easy identification.",
+    "benefits": [
+      "Provides clear test status indicators"
+    ]
+  },
+    {
+    "type": "staff_portal",
+    "product": "Assessment Platform",
+    "section": "StudentManagement",
+    "description": "Manage student accounts and track their progress."
+  },
+    {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "StudentManagement",
+    "feature": "ProfileManagement",
+    "description": "Staff can manage student profiles.",
+    "benefits": [
+      "Maintain accurate student records",
+      "Update student details"
+    ]
+  },
+    {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "StudentManagement",
+    "feature": "StudentClassification",
+    "description": "Students are displayed based on year.",
+    "benefits": [
+      "Efficient student categorization"
+    ]
+  },
+   {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "StudentManagement",
+    "feature": "SearchAndFilters",
+    "description": "Search students by name and filter them by college, department, and year.",
+    "benefits": [
+      "Quick access to student details",
+      "Improved data organization"
+    ]
+  },
+   {
+    "type": "staff_portal",
+    "product": "Assessment Platform",
+    "section": "StudentReports",
+    "description": "View and analyze student performance reports."
+  },
+    {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "StudentReports",
+    "feature": "StudentProfileOverview",
+    "description": "Displays the number of total tests taken, completed, and in progress.",
+    "benefits": [
+      "Tracks student engagement and progress"
+    ]
+  },
+   {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "StudentReports",
+    "feature": "PerformanceAnalysis",
+    "description": "Shows assessment details like total questions, correct answers, time taken, and incorrect answers.",
+    "benefits": [
+      "Detailed student performance tracking"
+    ]
+  },
+  {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "StudentReports",
+    "feature": "ProctoringViolations",
+    "description": "Displays anomalies such as full-screen breaches, face recognition mismatches, and audio disturbances.",
+    "benefits": [
+      "Ensures test integrity",
+      "Identifies potential cheating attempts"
+    ]
+  },
+   {
+    "type": "staff_portal",
+    "product": "Assessment Platform",
+    "section": "Library",
+    "description": "A repository for storing and managing questions and test collections."
+  },
+   {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "Library",
+    "feature": "QuestionLibrary",
+    "description": "Allows staff to add and save questions for future use.",
+    "benefits": [
+      "Reusable question bank",
+      "Facilitates test creation"
+    ]
+  },
+  {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "Library",
+    "feature": "FilteringOptions",
+    "description": "Filters questions by difficulty level and subject tags.",
+    "benefits": [
+      "Simplifies question selection",
+      "Ensures appropriate difficulty distribution"
+    ]
+  },
+   {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "Library",
+    "feature": "TestLibrary",
+    "description": "Stores sets of questions as collections for repeated use.",
+    "benefits": [
+      "Facilitates batch-wise test creation",
+      "Reduces redundant work"
+    ]
+  },
+ {
+    "type": "staff_portal",
+    "product": "Assessment Platform",
+    "section": "TestCreation",
+    "description": "Feature for staff to create, configure, and manage tests."
+  },
+   {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "TestCreation",
+    "feature": "AssessmentConfiguration",
+    "description": "Staff can set the test name, start and end time, description, and guidelines.",
+    "benefits": [
+      "Ensures proper test scheduling",
+      "Defines clear assessment rules"
+    ]
+  },
+    {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "TestCreation",
+    "feature": "ValidationChecks",
+    "description": "System ensures the opening time is from the present and closing time is after the opening.",
+    "benefits": [
+      "Prevents scheduling conflicts"
+    ]
+  },
+    {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "TestCreation",
+    "feature": "TestSettings",
+    "description": "Configure number of questions, duration, total marks, pass percentage, and result visibility.",
+    "benefits": [
+      "Flexible test structuring",
+      "Control over result release"
+    ]
+  },
+     {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "TestCreation",
+    "feature": "ProctoringModes",
+    "description": "Includes full-screen mode, face detection, noise detection, and device restriction.",
+    "benefits": [
+      "Enhances exam security",
+      "Prevents cheating"
+    ]
+  },
+      {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "TestCreation",
+    "feature": "QuestionImportOptions",
+    "description": "Staff can upload questions manually, in bulk, or from libraries.",
+    "benefits": [
+      "Multiple ways to import questions",
+      "Reduces manual effort"
+    ]
+  },
+     {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "TestCreation",
+    "feature": "AIQuestionGenerator",
+    "description": "Generates questions based on topic, sub-topic, and Bloom's taxonomy levels.",
+    "benefits": [
+      "Automates question creation",
+      "Ensures diverse cognitive levels"
+    ]
+  },
+      {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "TestCreation",
+    "feature": "PublishingOptions",
+    "description": "Publish tests using filters or search.",
+    "benefits": [
+      "Targeted test assignment"
+    ]
+  },
+       {
+    "type": "staff_portal_feature",
+    "product": "Assessment Platform",
+    "section": "TestCreation",
+    "feature": "SectionBasedTests",
+    "description": "Allows staff to create tests divided into sections such as aptitude, coding, logical reasoning, etc.",
+    "benefits": [
+      "Organized test structure",
+      "Better assessment of specific skill sets"
+    ]
+  },
+ {
+    "type": "student_portal",
+    "product": "Assessment Platform",
+    "section": "TestAccess",
+    "description": "Students can access tests based on their availability and view test details."
+  },
+   {
+    "type": "student_portal_feature",
+    "product": "Assessment Platform",
+    "section": "TestAccess",
+    "feature": "ActiveAssessments",
+    "description": "Students can see ongoing and live assessments.",
+    "benefits": [
+      "Real-time access to live tests",
+      "Ensures students participate on time"
+    ]
+  },
+     {
+    "type": "student_portal_feature",
+    "product": "Assessment Platform",
+    "section": "TestAccess",
+    "feature": "CompletedTests",
+    "description": "Students can view completed or closed test details.",
+    "benefits": [
+      "Allows review of past assessments",
+      "Helps track academic progress"
+    ]
+  },
+  {
+    "type": "student_portal_feature",
+    "product": "Assessment Platform",
+    "section": "TestAccess",
+    "feature": "UpcomingTests",
+    "description": "Tests that haven’t started yet are tagged as ‘Yet to Start’.",
+    "benefits": [
+      "Ensures students know about upcoming assessments",
+      "Prevents early access to tests"
+    ]
+  },
+  {
+    "type": "student_portal_feature",
+    "product": "Assessment Platform",
+    "section": "TestAccess",
+    "feature": "TestDetails",
+    "description": "Each test shows essential details such as title, registration period, duration, and assessment type.",
+    "benefits": [
+      "Provides complete test-related information",
+      "Helps students prepare accordingly"
+    ]
+  },
+   {
+    "type": "student_portal_feature",
+    "product": "Assessment Platform",
+    "section": "TestAccess",
+    "feature": "SectionDetails",
+    "description": "Displays the number of questions, sections, and total marks per test.",
+    "benefits": [
+      "Gives clarity on the test structure",
+      "Helps students strategize their approach"
+    ]
+  },
+    {
+    "type": "student_portal_feature",
+    "product": "Assessment Platform",
+    "section": "TestAccess",
+    "feature": "RulesAndRegulations",
+    "description": "Displays test guidelines, enabled proctoring modes, and pass percentage.",
+    "benefits": [
+      "Ensures students are aware of rules",
+      "Maintains test integrity"
+    ]
+  },
+{
+    "type": "student_portal",
+    "product": "Assessment Platform",
+    "section": "TestInterface",
+    "description": "User-friendly interface for students to take assessments efficiently."
+  },
+   {
+    "type": "student_portal_feature",
+    "product": "Assessment Platform",
+    "section": "TestInterface",
+    "feature": "QuestionNavigation",
+    "description": "Indicates the status of each question using different colors.",
+    "benefits": [
+      "Helps students track their progress",
+      "Improves time management during exams"
+    ]
+  },
+ {
+    "type": "student_portal_feature",
+    "product": "Assessment Platform",
+    "section": "TestInterface",
+    "feature": "AnswerIndicators",
+    "description": "Yellow for current question, green for answered, blue for review, and no color for unanswered.",
+    "benefits": [
+      "Clear visual cues for easy navigation",
+      "Reduces confusion during the test"
+    ]
+  },
+  {
+    "type": "student_portal_feature",
+    "product": "Assessment Platform",
+    "section": "TestInterface",
+    "feature": "MarkForReview",
+    "description": "Allows students to mark questions for later review.",
+    "benefits": [
+      "Helps students prioritize difficult questions",
+      "Ensures no question is left out"
+    ]
+  },
+    {
+    "type": "student_portal",
+    "product": "Assessment Platform",
+    "section": "ResultsAndReports",
+    "description": "Students can view their test results based on staff permissions."
+  },
+   {
+    "type": "student_portal_feature",
+    "product": "Assessment Platform",
+    "section": "ResultsAndReports",
+    "feature": "ImmediateResultAccess",
+    "description": "Students can see their results if staff allow immediate release.",
+    "benefits": [
+      "Instant feedback on performance",
+      "Encourages quick learning from mistakes"
+    ]
+  },
+   {
+    "type": "student_portal_feature",
+    "product": "Assessment Platform",
+    "section": "ResultsAndReports",
+    "feature": "HostControlledResults",
+    "description": "Results remain inaccessible if staff restrict student access.",
+    "benefits": [
+      "Allows staff to control when results are published"
+    ]
+  },
+   {
+    "type": "student_portal_feature",
+    "product": "Assessment Platform",
+    "section": "ResultsAndReports",
+    "feature": "DetailedPerformanceReport",
+    "description": "Displays a breakdown of total questions, correct answers, wrong answers, time taken, and proctoring violations.",
+    "benefits": [
+      "Comprehensive analysis of test performance",
+      "Helps students identify weak areas"
+    ]
+  },
+  {
+    "type": "student_portal_feature",
+    "product": "Assessment Platform",
+    "section": "ResultsAndReports",
+    "feature": "ProctoringViolations",
+    "description": "Lists full-screen policy breaches, face recognition anomalies, and audio disturbances detected.",
+    "benefits": [
+      "Ensures test integrity",
+      "Alerts students about potential issues"
+    ]
+  },
+   {
+    "type": "student_portal_feature",
+    "product": "Assessment Platform",
+    "section": "ResultsAndReports",
+    "feature": "ScoreBreakdown",
+    "description": "Displays the student’s total percentage, along with question details, student answers, and correct answers.",
+    "benefits": [
+      "Clear insight into performance",
+      "Enables self-evaluation"
+    ]
+  },
+   {
+    "type": "student_portal_feature",
+    "product": "Assessment Platform",
+    "section": "ResultsAndReports",
+    "feature": "QuestionFiltering",
+    "description": "Filters allow students to view all, correctly answered, incorrect, or unanswered questions.",
+    "benefits": [
+      "Facilitates targeted review of mistakes",
+      "Improves future test preparation"
+    ]
+  }
+]
