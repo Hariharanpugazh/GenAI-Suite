@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import SuperadminSidebar from "@/components/Superadmin/SuperadminSidebar";
+import AdminPageNavbar from "@/components/Admin/AdminSidebar"; // Import AdminPageNavbar
+import SuperAdminPageNavbar from "@/components/Superadmin/SuperadminSidebar"; // Import SuperAdminPageNavbar
+import VideoUploadModal from "@/components/Admin/Popup/VideoPopup";
+import ImageUploadModal from "@/components/Admin/Popup/ImagePopup";
 
 const PostProduct: React.FC = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [userRole, setUserRole] = useState(null);
 
   // Product Information
   const [productName, setProductName] = useState("");
@@ -26,6 +30,19 @@ const PostProduct: React.FC = () => {
 
   const MAX_NAME_LENGTH = 50;
   const MAX_DESC_LENGTH = 300;
+
+  // Modal state
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [isScreenshotModalOpen, setIsScreenshotModalOpen] = useState(false);
+  const [isThumbnailModalOpen, setIsThumbnailModalOpen] = useState(false);
+
+  useEffect(() => {
+    const token = Cookies.get("jwt");
+    if (token) {
+      const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
+      setUserRole(payload.role); // Set the user role
+    }
+  }, []);
 
   // Handle adding/removing user journeys
   const addUserJourney = () => {
@@ -48,14 +65,6 @@ const PostProduct: React.FC = () => {
     setProductFeatures(productFeatures.filter((_, i) => i !== index));
   };
 
-  // Handle file uploads
-  const handleFileUpload = (setFile: React.Dispatch<React.SetStateAction<File | null>>) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFile(file);
-    }
-  };
-
   // Handle API Submission
   const handleSubmit = async () => {
     if (!window.confirm("Are you sure you want to submit this product?")) return;
@@ -73,13 +82,13 @@ const PostProduct: React.FC = () => {
     const formData = new FormData();
 
     // Prepare user journey and product features data
-    const formattedData: { 
-      product_name: string; 
-      product_description: string; 
-      category: string; 
-      role: any; 
-      userId: any; 
-      [key: string]: any 
+    const formattedData: {
+      product_name: string;
+      product_description: string;
+      category: string;
+      role: any;
+      userId: any;
+      [key: string]: any;
     } = {
       product_name: productName,
       product_description: productDesc,
@@ -116,77 +125,117 @@ const PostProduct: React.FC = () => {
   };
 
   return (
-    <div className="flex">
-      <SuperadminSidebar />
-      <div className="p-6 max-w-3xl mx-auto">
+    <div className="flex bg-[F8F9FA]">
+      {userRole === "admin" && <AdminPageNavbar />}
+      {userRole === "superadmin" && <SuperAdminPageNavbar />}
+      <div className="p-6 w-full my-8 mx-16">
         <h2 className="text-2xl font-bold">Create a New Product</h2>
-        <hr className="my-4" />
+        <h5 className="text-lg font-thin mt-8 opacity-60"> Effortlessly add new products to your platform by providing key details such as name, description, template type, and resources. Customize product settings and ensure seamless integration into the marketplace.</h5>
+        <hr className="my-8 border-black " />
 
         {step === 1 && (
           <>
-            <label className="block font-semibold">Product Name:</label>
-            <input
-              type="text"
-              className="w-full border p-2 rounded-md"
-              placeholder="Enter product name"
-              value={productName}
-              onChange={(e) => setProductName(e.target.value)}
-              maxLength={MAX_NAME_LENGTH}
-            />
-            <p className="text-right text-sm">{productName.length} / {MAX_NAME_LENGTH}</p>
+            <label className="block text-xl font-semibold">Enter product Name:*</label>
+            <label className="block text-md opacity-60 font-thin my-3">Give your product a unique and descriptive name that reflects its purpose and value.</label>
+            <div className="flex items-center">
+              <div className="relative w-96 pr-3" style={{ width: '35.3rem' }}>
+                <input
+                  type="text"
+                  className="w-full m-0.5 p-2 rounded-md bg-white relative z-10 focus:outline-none"
+                  placeholder="Enter product name"
+                  value={productName}
+                  onChange={(e) => setProductName(e.target.value)}
+                  maxLength={MAX_NAME_LENGTH}
+                />
 
-            <label className="block font-semibold mt-4">Product Description:</label>
-            <textarea
-              className="w-full border p-2 rounded-md"
-              placeholder="Enter product description"
-              value={productDesc}
-              onChange={(e) => setProductDesc(e.target.value)}
-              maxLength={MAX_DESC_LENGTH}
-            />
+                <div className="absolute inset-0 rounded-md p-[1px] bg-gradient-to-r from-[#0795D4] via-[#DD0808] to-[#2606B3] opacity-50">
+                  <div className="w-full h-full bg-white rounded-md"></div>
+                </div>
+              </div>
+              <p className="ml-2 text-sm">{productName.length} / {MAX_NAME_LENGTH}</p>
+            </div>
+
+            <label className="block text-xl mt-8 font-semibold">Enter product description:*</label>
+            <label className="block text-md opacity-60 font-thin my-3">Give your product a unique and descriptive name that reflects its purpose and value.</label>
+            <div className="relative w-full h-40 pr-3 mt-5">
+              <textarea
+                className="w-full m-0.5 p-2 rounded-md bg-white relative z-10 focus:outline-none resize-none h-32"
+                placeholder="Enter product name"
+                value={productDesc}
+                onChange={(e) => setProductDesc(e.target.value)}
+                maxLength={MAX_DESC_LENGTH}
+              />
+
+              <div className="absolute inset-0 rounded-md p-[1px] bg-gradient-to-r from-[#0795D4] via-[#DD0808] to-[#2606B3] opacity-50">
+                <div className="w-full h-full bg-white rounded-md"></div>
+              </div>
+            </div>
             <p className="text-right text-sm">{productDesc.length} / {MAX_DESC_LENGTH}</p>
 
-            <label className="block font-semibold mt-4">Category:</label>
-            <input
-              type="text"
-              className="w-full border p-2 rounded-md"
-              placeholder="Enter category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            />
+            <label className="block text-xl mt-8 font-semibold">Enter Category:*</label>
+            <label className="block text-md opacity-60 font-thin my-3">Give your product a unique and descriptive name that reflects its purpose and value.</label>
 
-            <div className="mt-4">
-              <label className="block font-semibold">Upload Demo Video:</label>
-              <input
-                type="file"
-                className="w-full border p-2 rounded-md"
-                onChange={handleFileUpload(setVideo)}
-              />
+            <div className="relative w-full h-11 pr-3 mt-5" style={{ width: '35.3rem' }}>
+              <select
+                className="w-full m-0.5 p-2 rounded-md bg-white relative z-10 focus:outline-none "
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                <option value="" disabled>Select a category</option>
+                <option value="Smart City/Manufacturing">Smart City/Manufacturing</option>
+                <option value="Health Care">Health Care</option>
+                <option value="Agriculture and Food Technology">Agriculture and Food Technology</option>
+                <option value="Aerospace and Defence">Aerospace and Defence</option>
+                <option value="Automobile">Automobile</option>
+                <option value="Retail [FMCG], Real Estate, Entertainment & Finance [BFSI]">
+                  Retail [FMCG], Real Estate, Entertainment & Finance [BFSI]
+                </option>
+                <option value="Power / Energy">Power / Energy</option>
+              </select>
+
+              <div className="absolute inset-0 rounded-md p-[1px] bg-gradient-to-r from-[#0795D4] via-[#DD0808] to-[#2606B3] opacity-50">
+                <div className="w-full h-full bg-white rounded-md"></div>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div>
-                <label className="block font-semibold">Upload Screenshot:</label>
-                <input
-                  type="file"
-                  className="w-full border p-2 rounded-md"
-                  onChange={handleFileUpload(setScreenshot)}
-                />
+                <label className="block text-xl mt-8 font-semibold">Upload demo video of the product</label>
+                <label className="block text-md opacity-60 font-thin my-3">Give your product a unique and descriptive name that reflects.</label>
+                <button
+                  onClick={() => setIsVideoModalOpen(true)}
+                  className=" border py-4 px-28 mt-4 rounded-xl bg-black text-white cursor-pointer"
+                >
+                  Upload Video
+                </button>
               </div>
-
               <div>
-                <label className="block font-semibold">Upload Thumbnail:</label>
-                <input
-                  type="file"
-                  className="w-full border p-2 rounded-md"
-                  onChange={handleFileUpload(setThumbnail)}
-                />
+                <label className="block text-xl mt-8 font-semibold">Upload Screenshot of the product</label>
+                <label className="block text-md opacity-60 font-thin my-3">Give your product a unique and descriptive name that reflects.</label>
+                <button
+                  onClick={() => setIsScreenshotModalOpen(true)}
+                  className=" border py-4 px-24 mt-4 rounded-xl bg-black text-white cursor-pointer"
+                >
+                  Upload Screenshot
+                </button>
               </div>
             </div>
 
-            <div className="flex justify-between mt-6">
+            <div>
+              <label className="block text-xl mt-8 font-semibold">Upload Thumbnail of the product</label>
+              <label className="block text-md opacity-60 font-thin my-3">Give your product a unique and descriptive name that reflects.</label>
+              <button
+                onClick={() => setIsThumbnailModalOpen(true)}
+                className=" border py-4 px-24 my-4 rounded-xl bg-black text-white cursor-pointer"
+              >
+                Upload Thumbnail
+              </button>
+            </div>
+
+            <div className="flex justify-end mt-6">
               <button
                 onClick={() => setStep(2)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+                className="bg-black text-white px-4 py-2 rounded-lg"
               >
                 Next
               </button>
@@ -312,6 +361,23 @@ const PostProduct: React.FC = () => {
           </>
         )}
       </div>
+      <VideoUploadModal
+        isOpen={isVideoModalOpen}
+        onClose={() => setIsVideoModalOpen(false)}
+        onFileUpload={setVideo}
+      />
+      <ImageUploadModal
+        isOpen={isScreenshotModalOpen}
+        onClose={() => setIsScreenshotModalOpen(false)}
+        onFileUpload={setScreenshot}
+        title="Upload Screenshot"
+      />
+      <ImageUploadModal
+        isOpen={isThumbnailModalOpen}
+        onClose={() => setIsThumbnailModalOpen(false)}
+        onFileUpload={setThumbnail}
+        title="Upload Thumbnail"
+      />
     </div>
   );
 };
