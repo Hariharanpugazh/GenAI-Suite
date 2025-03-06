@@ -60,6 +60,7 @@ def fetch_data_from_api():
 # ✅ **3. Store Embeddings in MongoDB**
 def store_embeddings_in_mongo():
     products = fetch_data_from_api()
+    api_product_keys = set()  # To track valid product entries from API
 
     for product in products:
         user_id = product.get("user_id", "unknown_user")
@@ -92,11 +93,18 @@ def store_embeddings_in_mongo():
         content_hash = compute_hash(full_content)
 
         # 🔹 Check if the content already exists in MongoDB
-        existing_doc = collection.find_one({"user_id": user_id, "content_hash": content_hash}, {"_id": 1})
+        existing_doc = collection.find_one({"user_id": user_id, "product_name": product_name}, {"_id": 1, "content_hash": 1})
 
         if existing_doc:
-            print(f"🔹 Skipping {product_name} (Already exists and unchanged)")
-            continue  # Skip processing if content is the same
+            # ✅ If content hash matches → Data is unchanged, skip processing
+            if existing_doc["content_hash"] == content_hash:
+                print(f"✅ Skipping {product_name} (Data unchanged)")
+                api_product_keys.add((user_id, product_name))
+                continue
+
+            # 🔹 If content changed → Delete old entry before updating
+            print(f"🗑 Deleting outdated entry for {product_name}")
+            collection.delete_one({"user_id": user_id, "product_name": product_name})
 
         # 🔹 Compute embeddings
         embedding = embedding_model.encode(full_content).tolist()  # Convert NumPy array to list
@@ -119,8 +127,20 @@ def store_embeddings_in_mongo():
                 upsert=True,  # Insert if not exists
             )
             print(f"✅ Stored/Updated {product_name} in MongoDB")
+            api_product_keys.add((user_id, product_name))
+
         except Exception as e:
             print(f"❌ Error storing {product_name} in MongoDB: {e}")
+
+    # ✅ **4. Delete Stale Data (Not in API Response)**
+    all_db_products = collection.find({}, {"user_id": 1, "product_name": 1})
+    for db_product in all_db_products:
+        db_key = (db_product["user_id"], db_product["product_name"])
+        if db_key not in api_product_keys:
+            print(f"🗑 Removing stale product: {db_product['product_name']}")
+            collection.delete_one({"user_id": db_product["user_id"], "product_name": db_product["product_name"]})
+
+    print("✅ Knowledge base synced successfully!")
 
     print("✅ Knowledge base processed successfully!")
     data_loaded.set()
@@ -139,7 +159,6 @@ def search_mongo_vector(query, top_k=3):
 
         # Convert query to embedding
         query_embedding = embedding_model.encode([query]).tolist()[0]
-        print(f"✅ Query Embedding Generated: {query_embedding[:5]}...")  # Print first 5 values for debugging
 
         # Ensure stored embeddings exist and are of the same length
         sample_doc = collection.find_one({}, {"embedding": 1, "_id": 0})
@@ -191,7 +210,6 @@ def search_mongo_vector(query, top_k=3):
                 unique_contents.append(content)
                 seen_contents.add(content)
 
-        print(f"✅ Final Extracted Knowledge: {unique_contents}")
         return unique_contents
 
     except Exception as e:
