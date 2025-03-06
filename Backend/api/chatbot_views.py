@@ -31,131 +31,173 @@ client = MongoClient("mongodb+srv://ihub:ihub@cce.ksniz.mongodb.net/")
 db = client["GENAI"]
 collection = db["Chatbot_Knowledgebase"]
 
-# 🔹 Path to JSON Knowledge Base
-JSON_FOLDER = r"E:\\Rahul\\5-3-2025\\GenAI-Suite\\Knowledge_base"
-
 embedding_model = SentenceTransformer('jinaai/jina-embeddings-v2-base-en')
 print("Embedding dimension:", embedding_model.get_sentence_embedding_dimension())
 
 data_loaded = threading.Event()
-
 chat_history = []
 
 nlp = spacy.load("en_core_web_sm")
 
+# 🔹 API Endpoint
+API_URL = "http://127.0.0.1:8000/api/get-all-products/"
+
+# ✅ **1. Compute Hash**
 def compute_hash(content):
     return hashlib.sha256(content.encode()).hexdigest()
 
-def store_embeddings_in_mongo(json_folder):
-    knowledge_base, file_data = load_json_files(json_folder)
+# ✅ **2. Fetch JSON Data from API**
+def fetch_data_from_api():
+    try:
+        response = requests.get(API_URL)
+        response.raise_for_status()  # Raise error for HTTP issues
+        data = response.json()  # Convert response to JSON
+        return data.get("products", [])  # Extract the "products" list
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Error fetching data from API: {e}")
+        return []
+    
+# ✅ **3. Store Embeddings in MongoDB**
+def store_embeddings_in_mongo():
+    products = fetch_data_from_api()
 
-    for file_name, content in file_data:
-        content_hash = compute_hash(content)  # Generate hash
+    for product in products:
+        user_id = product.get("user_id", "unknown_user")
+        product_data = product.get("product_data", {})
+        product_name = product_data.get("product_name", "")
+        product_description = product_data.get("product_description", "")
+        category = product_data.get("category", "")
 
-        # Check if the file already exists and if the content has changed
-        existing_doc = collection.find_one({"file_name": file_name}, {"content_hash": 1})
+        user_journey = product.get("user_journey", [])
+        product_features = product.get("product_features", [])
 
-        if existing_doc and existing_doc.get("content_hash") == content_hash:
-            print(f"🔹 Skipping {file_name} (Already exists and unchanged)")
+        # 🔹 Convert user journey & features into text format
+        user_journey_text = "\n".join([f"{j['journey_name']}: {j['journey_description']}" for j in user_journey])
+        product_features_text = "\n".join([f"{f['feature_name']}: {f['feature_description']}" for f in product_features])
+
+        # 🔹 Combine all content for embedding
+        full_content = f"Product Name: {product_name}\nDescription: {product_description}\nCategory: {category}\nUser Journey: {user_journey_text}\nFeatures: {product_features_text}"
+
+        # 🔹 Debugging: Print extracted data before embedding
+        print("\n--- Extracted Data ---")
+        print(f"User ID: {user_id}")
+        print(f"Product Name: {product_name}")
+        print(f"Description: {product_description}")
+        print(f"Category: {category}")
+        print(f"User Journey: {user_journey_text}")
+        print(f"Features: {product_features_text}")
+        print("----------------------\n")
+
+        # 🔹 Compute hash for content
+        content_hash = compute_hash(full_content)
+
+        # 🔹 Check if the content already exists in MongoDB
+        existing_doc = collection.find_one({"user_id": user_id, "content_hash": content_hash}, {"_id": 1})
+
+        if existing_doc:
+            print(f"🔹 Skipping {product_name} (Already exists and unchanged)")
             continue  # Skip processing if content is the same
 
-        # Generate and store embeddings only if new or changed
-        embedding = embedding_model.encode(content).tolist()  # Convert NumPy array to list
+        # 🔹 Compute embeddings
+        embedding = embedding_model.encode(full_content).tolist()  # Convert NumPy array to list
 
+        # 🔹 Store in MongoDB
         try:
             collection.update_one(
-                {"file_name": file_name},  # Search condition
-                {"$set": {"content": content, "embedding": embedding, "content_hash": content_hash}},  # Update values
+                {"user_id": user_id, "product_name": product_name},  # Search condition
+                {"$set": {
+                    "user_id": user_id,
+                    "product_name": product_name,
+                    "description": product_description,
+                    "category": category,
+                    "user_journey": user_journey,
+                    "product_features": product_features,
+                    "content": full_content,
+                    "embedding": embedding,
+                    "content_hash": content_hash
+                }},
                 upsert=True,  # Insert if not exists
             )
-            print(f"✅ Stored/Updated {file_name} in MongoDB")
+            print(f"✅ Stored/Updated {product_name} in MongoDB")
         except Exception as e:
-            print(f"❌ Error storing {file_name} in MongoDB: {e}")
+            print(f"❌ Error storing {product_name} in MongoDB: {e}")
 
     print("✅ Knowledge base processed successfully!")
     data_loaded.set()
 
-# ✅ **2. Load JSON Data**
-def load_json_files(json_folder):
-    knowledge_base, file_data = [], []
-    for file_name in os.listdir(json_folder):
-        if file_name.endswith(".json"):
-            try:
-                with open(os.path.join(json_folder, file_name), "r", encoding="utf-8") as file:
-                    data = json.load(file)
-                    content = json.dumps(data)
-                    knowledge_base.append(content)
-                    file_data.append((file_name, content))
-            except json.JSONDecodeError as e:
-                print(f"❌ Error decoding JSON in file {file_name}: {e}")
-    return knowledge_base, file_data
 
-# ✅ **3. Search MongoDB for Relevant Knowledge**
 def search_mongo_vector(query, top_k=3):
-    query_embedding = embedding_model.encode([query]).tolist()[0]  # Convert to list
-
     try:
+        # Print all index information
+        indexes = collection.index_information()
+        print("Indexes in MongoDB collection:", indexes)
+
+        # Ensure MongoDB collection is initialized
+        if collection is None:
+            print("❌ Error: MongoDB collection is not initialized.")
+            return []
+
+        # Convert query to embedding
+        query_embedding = embedding_model.encode([query]).tolist()[0]
+        print(f"✅ Query Embedding Generated: {query_embedding[:5]}...")  # Print first 5 values for debugging
+
+        # Ensure stored embeddings exist and are of the same length
+        sample_doc = collection.find_one({}, {"embedding": 1, "_id": 0})
+        if not sample_doc or "embedding" not in sample_doc:
+            print("❌ Error: No documents with embeddings found in MongoDB.")
+            return []
+
+        stored_embedding_length = len(sample_doc["embedding"])
+        query_embedding_length = len(query_embedding)
+
+        if stored_embedding_length != query_embedding_length:
+            print(f"❌ Error: Query embedding size ({query_embedding_length}) does not match stored embeddings ({stored_embedding_length}).")
+            return []
+
+        # Ensure numCandidates is always >= top_k
+        num_candidates = max(top_k, 10)  # Increased to 10 for better results
+
+        # Vector search pipeline
         pipeline = [
             {
                 "$vectorSearch": {
                     "index": "updated_vector",  # Ensure vector index exists
                     "path": "embedding",
                     "queryVector": query_embedding,
-                    "numCandidates": 2,
+                    "numCandidates": num_candidates,
                     "limit": top_k,
                     "similarity": "cosine"
                 }
             }
         ]
-        results = collection.aggregate(pipeline)  # Run vector search query
-        
+
+        results_cursor = collection.aggregate(pipeline)  # Run vector search query
+        print(f"The result cursor is {results_cursor}")
+        results = list(results_cursor)  # Convert cursor to list to prevent cursor exhaustion
+
+        if not results:
+            print("⚠️ No relevant documents found in MongoDB.")
+            return []
+
+        print(f"🔍 Raw MongoDB Results: {results}")
+
         # Extract unique contents while preserving order
         unique_contents = []
         seen_contents = set()
 
         for doc in results:
-            content = doc["content"].strip()  # Remove unnecessary whitespace
-            if content and content not in seen_contents:  # Ensure uniqueness
+            content = doc.get("content", "").strip()  # Use `.get()` to avoid KeyError
+            if content and content not in seen_contents:
                 unique_contents.append(content)
                 seen_contents.add(content)
 
+        print(f"✅ Final Extracted Knowledge: {unique_contents}")
         return unique_contents
 
     except Exception as e:
         print(f"❌ Vector search error: {e}")
         return []
 
-def check_scheduling_intent(query, chat_history):
-    history_text = "\n".join([f"{msg['role']}: {msg['content']}" for msg in chat_history])
-
-    prompt = f"""
-    You are an expert at understanding user intent for scheduling meetings. you are provided with the conversation history
-    Analyze the conversation and determine if the user wants to schedule a demo or meeting. or shown any interest to schedule a meeting
-    Return ONLY "yes" or "no".
-
-    Consider direct requests (e.g., "Can we schedule a meeting?") and indirect cues
-    (e.g., "I think I need a demo," "When are you available?").
-    
-
-    Conversation:
-    {history_text}
-
-    User Query: {query}
-
-    Intent to Schedule Meeting (yes/no):
-    """
-
-    try:
-        response = scheduling_model.generate_content(prompt)
-        intent = response.text.strip().lower()
-        print(f"Scheduling Intent Detection: {intent}")
-        if "yes" in intent:
-            return "yes"
-        else:
-            return "no"
-    except Exception as e:
-        print(f"❌ Scheduling Intent API Error: {e}")
-        return "no"
 
 # ✅ **4. Generate Answer with Gemini**
 def generate_answer_with_rag(query, closest_knowledge_list, chat_history):
@@ -174,12 +216,12 @@ def generate_answer_with_rag(query, closest_knowledge_list, chat_history):
         # Incorporate chat history into the prompt
         history_text = "\n".join([f"{msg['role']}: {msg['content']}" for msg in chat_history[:-3]])
         print(history_text)
+        
+        print(f"The answer of combined knowledge is : {combined_knowledge}")
 
         prompt = f"""
         You are a professional AI assistant for SNS iHub, focused on engaging users and promoting SNS Gen Ai Suite which includes the below :.
         1.Products
-        2.Innovation Hub
-        3.Fivepillars
         Your goal is to:
         - Understand the user's interest and provide relevant information. Answer only the question without additional context.
         - Provide concise, well-structured, and engaging responses.
@@ -188,9 +230,6 @@ def generate_answer_with_rag(query, closest_knowledge_list, chat_history):
         (for example : the user ask "tell me about products , the model provides the response , after the user ask about its benefit , then he is interested about products , then you suggest scheduling a demo along with the model response else , provide only response , dont ask for schduling
         - Make the response brief and clear, without long answers.
 
-        Analyze the previous conversation and find the interest of the user and in the conversation if the user shows the intent for scheduling the demo or meeting then return "yes", else "no"
-        (for example :models response :The Assessment Platform streamlines assessments, improving efficiency for staff and providing detailed performance reports for students. This leads to better understanding of student progress and more effective learning. Interested in seeing a demo? and
-        user response , "yes" , then he interested in scheduling meet, the user can show the scheduling intent in direct or indirect for example , can you schedule meet? or i think i need a meet) analyze it properly
 
         🚨 IMPORTANT RULES:  
         - If the user asks **anything not covered** in the knowledge, respond with:  
@@ -224,169 +263,9 @@ def generate_answer_with_rag(query, closest_knowledge_list, chat_history):
             print(f"❌ Gemini API Error: {e}")
             return "Sry , Currently we seem a overloading , try again later !!"
 
-# ✅ **5. New Function to Handle Scheduling**
-def schedule_demo(chat_history):
-    """Handles the scheduling of a demo with natural language understanding."""
-    history_text = "\n".join([f"{msg['role']}: {msg['content']}" for msg in chat_history])
 
-    # Initialize scheduling data with default year
-    scheduling_data = {
-        "date": None,
-        "time": None,
-        "email": None,
-        "current_step": "initial"
-    }
-
-    # Update with any existing data from history
-    for msg in chat_history:
-        if "scheduling_data" in msg:
-            existing_data = msg["scheduling_data"]
-            scheduling_data.update(existing_data)  # Update all fields including current_step
-
-    def parse_datetime_with_gemini(text):
-        """Use Gemini to parse natural language date and time."""
-        current_date = datetime.now()
-        
-        prompt = f"""
-        Current date and time: {current_date.strftime('%Y-%m-%d %H:%M')} IST
-        User input: "{text}"
-
-        Convert the user's date and time input to standard format.
-        If input is unclear or invalid, return "invalid".
-
-        Consider:
-        - Tomorrow means next day
-        - Morning times (6 AM - 11:59 AM)
-        - Afternoon times (12 PM - 4:59 PM)
-        - Evening times (5 PM - 11:59 PM)
-        - Business hours are 9 AM to 6 PM IST
-        - Convert all times to 24-hour format
-        - Set date to current date if only time is mentioned
-
-        Return exactly in this format (nothing else):
-        YYYY-MM-DD|HH:MM
-        """
-
-        try:
-            response = scheduling_model.generate_content(prompt)
-            parsed = response.text.strip()
-            
-            if parsed == "invalid":
-                return False
-                
-            date_str, time_str = parsed.split("|")
-            
-            # Validate the parsed datetime
-            parsed_dt = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
-            current_dt = datetime.now()
-            
-            # Check if time is in the past
-            if parsed_dt < current_dt:
-                return False
-                
-            # Check business hours (9 AM to 6 PM)
-            hour = parsed_dt.hour
-            if hour < 9 or hour >= 18:
-                return False
-                
-            scheduling_data["date"] = date_str
-            scheduling_data["time"] = time_str
-            return True
-            
-        except Exception as e:
-            print(f"Error parsing datetime: {e}")
-            return False
-
-    def extract_email(text):
-        """Extract email address from text."""
-        email_match = re.search(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", text)
-        if email_match:
-            email = email_match.group(0)
-            scheduling_data["email"] = email
-            return True
-        return False
-
-    def get_next_response():
-        """Get the next appropriate response based on current state."""
-        
-        # Initial state or datetime needed
-        if scheduling_data["date"] is None or scheduling_data["time"] is None:
-            scheduling_data["current_step"] = "datetime"
-            return (
-                "Could you please specify when you'd like to schedule the demo? "
-                "You can say something like 'tomorrow at 11 AM' or 'next Monday at 2 PM'. "
-                "(Our demo slots are available between 9 AM and 6 PM IST)"
-            )
-        
-        # Need email
-        if scheduling_data["email"] is None:
-            scheduling_data["current_step"] = "email"
-            return "Great! Could you please share your email address?"
-        
-        # All information collected - show confirmation
-        scheduling_data["current_step"] = "confirmation"
-        return (
-            f"Perfect! Here are your demo details:\n"
-            f"📅 Date: {scheduling_data['date']}\n"
-            f"⏰ Time: {scheduling_data['time']} IST\n"
-            f"📧 Email: {scheduling_data['email']}\n"
-            f"Please confirm if these details are correct (yes/no)?"
-        )
-
-    # Process the latest user message
-    latest_msg = chat_history[-1]["content"].lower()
-    
-    # Handle confirmation state
-    if scheduling_data["current_step"] == "confirmation":
-        if "yes" in latest_msg or "confirm" in latest_msg:
-            try:
-                # Save to MongoDB
-                db.scheduled_demos.insert_one({
-                    "date": scheduling_data["date"],
-                    "time": scheduling_data["time"],
-                    "email": scheduling_data["email"],
-                    "scheduled_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    "status": "confirmed"
-                })
-                scheduling_data["current_step"] = "completed"
-                return "✅ Your demo has been successfully scheduled! You'll receive a confirmation email shortly.", scheduling_data
-            except Exception as e:
-                print(f"Error saving to database: {e}")
-                return "❌ There was an error scheduling your demo. Please try again.", scheduling_data
-        elif "no" in latest_msg:
-            # Reset scheduling data but keep email if we have it
-            email = scheduling_data.get("email")
-            scheduling_data = {
-                "date": None,
-                "time": None,
-                "email": email,
-                "current_step": "datetime"
-            }
-            return "Let's try again. When would you like to schedule the demo?", scheduling_data
-    
-    # Handle current step
-    if scheduling_data["current_step"] == "datetime":
-        if parse_datetime_with_gemini(latest_msg):
-            # Successfully parsed date/time, move to next step
-            return get_next_response(), scheduling_data
-        else:
-            return (
-                "I couldn't understand that time format or it's outside our demo hours (9 AM - 6 PM IST). "
-                "Please try again with something like 'tomorrow at 11 AM' or 'next Monday at 2 PM'."
-            ), scheduling_data
-            
-    elif scheduling_data["current_step"] == "email":
-        if extract_email(latest_msg):
-            # Successfully got email, move to next step
-            return get_next_response(), scheduling_data
-        else:
-            return "I couldn't find a valid email address. Could you please provide your email?", scheduling_data
-    
-    # Get next response for current state
-    return get_next_response(), scheduling_data
             
 # ✅ **6. API Endpoint for Chatbot**
-
 @api_view(["POST"])
 def chatbot_view(request):
     global chat_history
@@ -582,9 +461,207 @@ def send_email_notification(user_email, user_name, date, time):
         print(f"Email sent to {user_email}")
     except Exception as e:
         print(f"Failed to send email: {e}")
+        
+        
+def check_scheduling_intent(query, chat_history):
+    history_text = "\n".join([f"{msg['role']}: {msg['content']}" for msg in chat_history])
+
+    prompt = f"""
+    You are an expert at understanding user intent for scheduling meetings. you are provided with the conversation history
+    Analyze the conversation and determine if the user wants to schedule a demo or meeting. or shown any interest to schedule a meeting
+    Return ONLY "yes" or "no".
+
+    Consider direct requests (e.g., "Can we schedule a meeting?") and indirect cues
+    (e.g., "I think I need a demo," "When are you available?").
+    
+
+    Conversation:
+    {history_text}
+
+    User Query: {query}
+
+    Intent to Schedule Meeting (yes/no):
+    """
+
+    try:
+        response = scheduling_model.generate_content(prompt)
+        intent = response.text.strip().lower()
+        print(f"Scheduling Intent Detection: {intent}")
+        if "yes" in intent:
+            return "yes"
+        else:
+            return "no"
+    except Exception as e:
+        print(f"❌ Scheduling Intent API Error: {e}")
+        return "no"
+
+
+
+# ✅ **5. New Function to Handle Scheduling**
+def schedule_demo(chat_history):
+    """Handles the scheduling of a demo with natural language understanding."""
+    history_text = "\n".join([f"{msg['role']}: {msg['content']}" for msg in chat_history])  # noqa: F841
+
+    # Initialize scheduling data with default year
+    scheduling_data = {
+        "date": None,
+        "time": None,
+        "email": None,
+        "current_step": "initial"
+    }
+
+    # Update with any existing data from history
+    for msg in chat_history:
+        if "scheduling_data" in msg:
+            existing_data = msg["scheduling_data"]
+            scheduling_data.update(existing_data)  # Update all fields including current_step
+
+    def parse_datetime_with_gemini(text):
+        """Use Gemini to parse natural language date and time."""
+        current_date = datetime.now()
+        
+        prompt = f"""
+        Current date and time: {current_date.strftime('%Y-%m-%d %H:%M')} IST
+        User input: "{text}"
+
+        Convert the user's date and time input to standard format.
+        If input is unclear or invalid, return "invalid".
+
+        Consider:
+        - Tomorrow means next day
+        - Morning times (6 AM - 11:59 AM)
+        - Afternoon times (12 PM - 4:59 PM)
+        - Evening times (5 PM - 11:59 PM)
+        - Business hours are 9 AM to 6 PM IST
+        - Convert all times to 24-hour format
+        - Set date to current date if only time is mentioned
+
+        Return exactly in this format (nothing else):
+        YYYY-MM-DD|HH:MM
+        """
+
+        try:
+            response = scheduling_model.generate_content(prompt)
+            parsed = response.text.strip()
+            
+            if parsed == "invalid":
+                return False
+                
+            date_str, time_str = parsed.split("|")
+            
+            # Validate the parsed datetime
+            parsed_dt = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
+            current_dt = datetime.now()
+            
+            # Check if time is in the past
+            if parsed_dt < current_dt:
+                return False
+                
+            # Check business hours (9 AM to 6 PM)
+            hour = parsed_dt.hour
+            if hour < 9 or hour >= 18:
+                return False
+                
+            scheduling_data["date"] = date_str
+            scheduling_data["time"] = time_str
+            return True
+            
+        except Exception as e:
+            print(f"Error parsing datetime: {e}")
+            return False
+
+    def extract_email(text):
+        """Extract email address from text."""
+        email_match = re.search(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", text)
+        if email_match:
+            email = email_match.group(0)
+            scheduling_data["email"] = email
+            return True
+        return False
+
+    def get_next_response():
+        """Get the next appropriate response based on current state."""
+        
+        # Initial state or datetime needed
+        if scheduling_data["date"] is None or scheduling_data["time"] is None:
+            scheduling_data["current_step"] = "datetime"
+            return (
+                "Could you please specify when you'd like to schedule the demo? "
+                "You can say something like 'tomorrow at 11 AM' or 'next Monday at 2 PM'. "
+                "(Our demo slots are available between 9 AM and 6 PM IST)"
+            )
+        
+        # Need email
+        if scheduling_data["email"] is None:
+            scheduling_data["current_step"] = "email"
+            return "Great! Could you please share your email address?"
+        
+        # All information collected - show confirmation
+        scheduling_data["current_step"] = "confirmation"
+        return (
+            f"Perfect! Here are your demo details:\n"
+            f"📅 Date: {scheduling_data['date']}\n"
+            f"⏰ Time: {scheduling_data['time']} IST\n"
+            f"📧 Email: {scheduling_data['email']}\n"
+            f"Please confirm if these details are correct (yes/no)?"
+        )
+
+    # Process the latest user message
+    latest_msg = chat_history[-1]["content"].lower()
+    
+    # Handle confirmation state
+    if scheduling_data["current_step"] == "confirmation":
+        if "yes" in latest_msg or "confirm" in latest_msg:
+            try:
+                # Save to MongoDB
+                db.scheduled_demos.insert_one({
+                    "date": scheduling_data["date"],
+                    "time": scheduling_data["time"],
+                    "email": scheduling_data["email"],
+                    "scheduled_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "status": "confirmed"
+                })
+                scheduling_data["current_step"] = "completed"
+                return "✅ Your demo has been successfully scheduled! You'll receive a confirmation email shortly.", scheduling_data
+            except Exception as e:
+                print(f"Error saving to database: {e}")
+                return "❌ There was an error scheduling your demo. Please try again.", scheduling_data
+        elif "no" in latest_msg:
+            # Reset scheduling data but keep email if we have it
+            email = scheduling_data.get("email")
+            scheduling_data = {
+                "date": None,
+                "time": None,
+                "email": email,
+                "current_step": "datetime"
+            }
+            return "Let's try again. When would you like to schedule the demo?", scheduling_data
+    
+    # Handle current step
+    if scheduling_data["current_step"] == "datetime":
+        if parse_datetime_with_gemini(latest_msg):
+            # Successfully parsed date/time, move to next step
+            return get_next_response(), scheduling_data
+        else:
+            return (
+                "I couldn't understand that time format or it's outside our demo hours (9 AM - 6 PM IST). "
+                "Please try again with something like 'tomorrow at 11 AM' or 'next Monday at 2 PM'."
+            ), scheduling_data
+            
+    elif scheduling_data["current_step"] == "email":
+        if extract_email(latest_msg):
+            # Successfully got email, move to next step
+            return get_next_response(), scheduling_data
+        else:
+            return "I couldn't find a valid email address. Could you please provide your email?", scheduling_data
+    
+    # Get next response for current state
+    return get_next_response(), scheduling_data
+
 
     
 # ✅ **7. Load Data on Startup (Runs in Background)**
-loading_thread = threading.Thread(target=store_embeddings_in_mongo, args=(JSON_FOLDER,), daemon=True)
+loading_thread = threading.Thread(target=store_embeddings_in_mongo, daemon=True)
 loading_thread.start()
+
 
