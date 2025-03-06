@@ -14,6 +14,8 @@ import {
   ExpandableChatFooter,
 } from "@/components/Chatbot/expandable-chat"
 import { ChatMessageList } from "@/components/Chatbot/chat-message-list"
+import axios from "axios";
+
 
 export default function Chatbot() {
   const [messages, setMessages] = useState([
@@ -22,48 +24,48 @@ export default function Chatbot() {
       content: "Hello! How can I help you today?",
       sender: "ai",
     },
-    {
-      id: 2,
-      content: "I have a question about the component library.",
+  ]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+
+    const userMessage = {
+      id: messages.length + 1,
+      content: input,
       sender: "user",
-    },
-    {
-      id: 3,
-      content: "Sure! I'd be happy to help. What would you like to know?",
-      sender: "ai",
-    },
-  ])
+    };
 
-  const [input, setInput] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setIsLoading(true);
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    if (!input.trim()) return
+    try {
+      const response = await axios.post("http://127.0.0.1:8000/api/chat/", {
+        query: input,
+      });
 
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: prev.length + 1,
-        content: input,
-        sender: "user",
-      },
-    ])
-    setInput("")
-    setIsLoading(true)
+      const aiMessage = {
+        id: messages.length + 2,
+        content: response.data.answer,
+        sender: "ai",
+      };
 
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: prev.length + 1,
-          content: "This is an AI response to your message.",
-          sender: "ai",
-        },
-      ])
-      setIsLoading(false)
-    }, 1000)
-  }
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      console.error("Error fetching AI response:", error);
+      const errorMessage = {
+        id: messages.length + 2,
+        content: "Oops! Something went wrong. Please try again.",
+        sender: "ai",
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleAttachFile = () => {
     //
