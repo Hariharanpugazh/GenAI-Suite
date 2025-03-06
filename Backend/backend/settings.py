@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -141,3 +142,6 @@ CORS_ALLOW_HEADERS = [
 CORS_ALLOW_ALL_ORIGINS = True  # Allow all origins
 CORS_ALLOW_CREDENTIALS = True  # Allow credentials (cookies)
 CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]  # Allow all HTTP methods
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

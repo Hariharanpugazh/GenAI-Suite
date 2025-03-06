@@ -137,7 +137,7 @@ export default function ManageProducts() {
                 <div className="relative mb-6">
                   <div className="overflow-hidden rounded-[12px]">
                     <img
-                      src={product.product_data.thumbnail ? `data:image/jpeg;base64,${product.product_data.thumbnail}` : "/placeholder.svg"}
+                      src={`http://127.0.0.1:8000${product.product_data.thumbnail}`}
                       alt={product.product_data.product_name}
                       className="w-full h-[140px] object-cover transition-transform duration-300 hover:scale-125"
                     />

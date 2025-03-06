@@ -25,6 +25,7 @@ urlpatterns = [
 
     #PRODUCTS
     path("post_product/", post_product, name="post_product"),
+    path('get_product/', get_products, name="get_product"),
     path('get-all-products/',get_all_products, name="get_all_products"),
     
     #CHATBOT
