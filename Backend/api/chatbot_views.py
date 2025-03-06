@@ -185,7 +185,7 @@ def generate_answer_with_rag(query, closest_knowledge_list, chat_history):
         - Provide concise, well-structured, and engaging responses.
         - Offer relevant information while subtly encouraging user interaction.
         - Suggest scheduling a demo when strong interest is detected. the interest detection can be found by whether the user asks two questions about specific products or topic then he is interested
-        (for example : the user ask "tell me about assesment platform , the model provides the response , after the user ask about its benefit , then he is interested about assesment platform , then you suggest scheduling a demo along with the model response else , provide only response , dont ask for schduling
+        (for example : the user ask "tell me about products , the model provides the response , after the user ask about its benefit , then he is interested about products , then you suggest scheduling a demo along with the model response else , provide only response , dont ask for schduling
         - Make the response brief and clear, without long answers.
 
         Analyze the previous conversation and find the interest of the user and in the conversation if the user shows the intent for scheduling the demo or meeting then return "yes", else "no"
