@@ -31,7 +31,7 @@ const UserLogin = () => {
       const data = await response.json();
       if (response.ok) {
         Cookies.set("jwt", data.token.jwt, { expires: 1, secure: true, sameSite: "Strict" });
-        navigate("/user-dashboard");
+        navigate("/products-list");
       } else if (data.error === "User not found") {
         setIsNewUser(true); // Flag for new users
       } else {

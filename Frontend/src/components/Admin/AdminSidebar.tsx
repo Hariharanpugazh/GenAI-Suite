@@ -1,12 +1,39 @@
 import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom"; // Import navigation hooks
 import { Home, Package, Users, TrendingUp, MessageSquare, LogOut, User, Settings } from "lucide-react";
+import logo  from "../../assets/ihub.png"
 
 const AdminSidebar = () => {
-  const [active, setActive] = useState("Dashboard");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [active, setActive] = useState(location.pathname);
+  const [productsDropdown, setProductsDropdown] = useState(false); // State to toggle dropdown
+
+  const handleLogout = () => {
+    // Clear all storage
+    localStorage.clear();
+    sessionStorage.clear();
+    document.cookie.split(";").forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
+    });
+
+    // Redirect to home page
+    navigate("/");
+  };
 
   const menuItems = [
-    { name: "Dashboard", icon: <Home size={18} />, path: "/admin/dashboard" },
-    { name: "Products", icon: <Package size={18} />, path: "/admin/products", subMenu: ["Create product"] },
+    { name: "Dashboard", icon: <Home size={18} />, path: "/admin-dashboard" },
+    {
+      name: "Products",
+      icon: <Package size={18} />,
+      path: "/admin/products",
+      subMenu: [
+        { name: "Create Product", path: "/post-product" },
+        { name: "My Products", path: "/admin/products" },
+      ],
+    },
     { name: "Chatbot", icon: <MessageSquare size={18} />, path: "/admin/chatbot" },
     { name: "Response", icon: <MessageSquare size={18} />, path: "/admin/response" },
     { name: "Trending Products", icon: <TrendingUp size={18} />, path: "/admin/trending" },
@@ -18,7 +45,7 @@ const AdminSidebar = () => {
     <div className="w-64 h-screen bg-white shadow-lg flex flex-col p-4">
       {/* Logo */}
       <div className="flex items-center space-x-2 mb-6">
-        <img src="/logo.png" alt="Admin Logo" className="w-10 h-10" />
+        <img src={logo} alt="Admin Logo" className="w-10 h-10" />
         <span className="text-lg font-semibold">Admin Panel</span>
       </div>
 
@@ -27,20 +54,35 @@ const AdminSidebar = () => {
         {menuItems.map((item, index) => (
           <div key={index} className="mb-2">
             <button
-              onClick={() => setActive(item.name)}
+              onClick={() => {
+                if (item.subMenu) {
+                  setProductsDropdown(!productsDropdown);
+                } else {
+                  setActive(item.path);
+                  navigate(item.path);
+                }
+              }}
               className={`w-full flex items-center space-x-3 px-4 py-2 rounded-lg transition ${
-                active === item.name ? "bg-black text-white" : "text-gray-700 hover:bg-gray-100"
+                active === item.path ? "bg-black text-white" : "text-gray-700 hover:bg-gray-100"
               }`}
             >
               {item.icon}
               <span>{item.name}</span>
             </button>
+
             {/* Submenu for Products */}
-            {item.subMenu && active === item.name && (
+            {item.subMenu && productsDropdown && (
               <div className="pl-8 mt-1">
                 {item.subMenu.map((sub, i) => (
-                  <button key={i} className="block text-sm text-gray-600 hover:text-black py-1">
-                    + {sub}
+                  <button
+                    key={i}
+                    className="block text-sm text-gray-600 hover:text-black py-1"
+                    onClick={() => {
+                      setActive(sub.path);
+                      navigate(sub.path);
+                    }}
+                  >
+                    + {sub.name}
                   </button>
                 ))}
               </div>
@@ -55,7 +97,10 @@ const AdminSidebar = () => {
           <User size={18} />
           <span>Profile</span>
         </button>
-        <button className="flex items-center space-x-3 px-4 py-2 text-red-600 hover:bg-red-100 w-full">
+        <button
+          onClick={handleLogout}
+          className="flex items-center space-x-3 px-4 py-2 text-red-600 hover:bg-red-100 w-full"
+        >
           <LogOut size={18} />
           <span>Logout</span>
         </button>

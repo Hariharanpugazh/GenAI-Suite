@@ -1,0 +1,29 @@
+{
+    "fivePillars": {
+      "description": "That Builds Overall Growth. Educational Space That Provides a Unique Lifestyle. 5 centers which act as our pillars of SNS covering all streams of life to strengthen our education system. Rather than providing a traditional learning environment, we focus on building a culture that emphasizes effective teaching and learning, innovation, skill and entrepreneurship development, industry connection, and social responsibility initiatives.",
+      "benefits": "Applying Design Thinking to all these dimensions helps students to have the academic freedom to understand complex problems and principles through engaging learning activities and nurtures progressive minds. With leading-edge faculty and remarkable alumni, we are committed to providing students with a challenging and relevant education that develops their ability to have an impact on the world and solve the most pressing social issues of our nation.",
+      "centers": [
+        {
+          "name": "Center for Learning and Teaching",
+          "focus": "Design Thinking based Academic Learning."
+        },
+        {
+          "name": "Skill and Career Development",
+          "focus": "Building Life Skills (Social, Emotional, and Cognitive) through various Clubs."
+        },
+        {
+          "name": "Center For Creativity",
+          "focus": "Hands-on Experience to Solve Key Industrial Problems through Latest Technologies."
+        },
+        {
+          "name": "Industry Institute Partnership Cell",
+          "focus": "Connecting and Learning Business Sense of Top Industries."
+        },
+        {
+          "name": "Social Responsibility Initiatives",
+          "focus": "Giving back to the Society through Social Service."
+        }
+      ]
+    }
+  }
+  

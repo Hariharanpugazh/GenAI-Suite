@@ -1,16 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import SuperadminSidebar from "@/components/Superadmin/SuperadminSidebar";
+import AdminPageNavbar from "@/components/Admin/AdminSidebar"; // Import AdminPageNavbar
+import SuperAdminPageNavbar from "@/components/Superadmin/SuperadminSidebar"; // Import SuperAdminPageNavbar
 import VideoUploadModal from "@/components/Admin/Popup/VideoPopup";
 import ImageUploadModal from "@/components/Admin/Popup/ImagePopup";
 
 const PostProduct: React.FC = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [userRole, setUserRole] = useState(null);
 
   // Product Information
   const [productName, setProductName] = useState("");
@@ -33,6 +35,14 @@ const PostProduct: React.FC = () => {
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isScreenshotModalOpen, setIsScreenshotModalOpen] = useState(false);
   const [isThumbnailModalOpen, setIsThumbnailModalOpen] = useState(false);
+
+  useEffect(() => {
+    const token = Cookies.get("jwt");
+    if (token) {
+      const payload = JSON.parse(atob(token.split(".")[1])); // Decode JWT payload
+      setUserRole(payload.role); // Set the user role
+    }
+  }, []);
 
   // Handle adding/removing user journeys
   const addUserJourney = () => {
@@ -116,7 +126,8 @@ const PostProduct: React.FC = () => {
 
   return (
     <div className="flex bg-[F8F9FA]">
-      <SuperadminSidebar />
+      {userRole === "admin" && <AdminPageNavbar />}
+      {userRole === "superadmin" && <SuperAdminPageNavbar />}
       <div className="p-6 w-full my-8 mx-16">
         <h2 className="text-2xl font-bold">Create a New Product</h2>
         <h5 className="text-lg font-thin mt-8 opacity-60"> Effortlessly add new products to your platform by providing key details such as name, description, template type, and resources. Customize product settings and ensure seamless integration into the marketplace.</h5>
@@ -187,22 +198,20 @@ const PostProduct: React.FC = () => {
               </div>
             </div>
 
-
-
             <div className="grid grid-cols-2 gap-4 mt-4">
-            <div >
-            <label className="block text-xl mt-8 font-semibold">Upload demo video of the product</label>
-            <label className="block text-md opacity-60 font-thin my-3">Give your product a unique and descriptive name that reflects.</label>
-              <button
-                onClick={() => setIsVideoModalOpen(true)}
-                className=" border py-4 px-28 mt-4 rounded-xl bg-black text-white cursor-pointer"
-              >
-                Upload Video
-              </button>
-            </div>
               <div>
-              <label className="block text-xl mt-8 font-semibold">Upload Screenshot of the product</label>
-              <label className="block text-md opacity-60 font-thin my-3">Give your product a unique and descriptive name that reflects.</label>
+                <label className="block text-xl mt-8 font-semibold">Upload demo video of the product</label>
+                <label className="block text-md opacity-60 font-thin my-3">Give your product a unique and descriptive name that reflects.</label>
+                <button
+                  onClick={() => setIsVideoModalOpen(true)}
+                  className=" border py-4 px-28 mt-4 rounded-xl bg-black text-white cursor-pointer"
+                >
+                  Upload Video
+                </button>
+              </div>
+              <div>
+                <label className="block text-xl mt-8 font-semibold">Upload Screenshot of the product</label>
+                <label className="block text-md opacity-60 font-thin my-3">Give your product a unique and descriptive name that reflects.</label>
                 <button
                   onClick={() => setIsScreenshotModalOpen(true)}
                   className=" border py-4 px-24 mt-4 rounded-xl bg-black text-white cursor-pointer"
@@ -210,20 +219,18 @@ const PostProduct: React.FC = () => {
                   Upload Screenshot
                 </button>
               </div>
-
-              
             </div>
 
             <div>
               <label className="block text-xl mt-8 font-semibold">Upload Thumbnail of the product</label>
               <label className="block text-md opacity-60 font-thin my-3">Give your product a unique and descriptive name that reflects.</label>
-                <button
-                  onClick={() => setIsThumbnailModalOpen(true)}
-                  className=" border py-4 px-24 my-4 rounded-xl bg-black text-white cursor-pointer"
-                >
-                  Upload Thumbnail
-                </button>
-              </div>
+              <button
+                onClick={() => setIsThumbnailModalOpen(true)}
+                className=" border py-4 px-24 my-4 rounded-xl bg-black text-white cursor-pointer"
+              >
+                Upload Thumbnail
+              </button>
+            </div>
 
             <div className="flex justify-end mt-6">
               <button

@@ -1,5 +1,5 @@
 import React from "react";
-import { FiUsers, FiShoppingCart, FiTrendingDown, FiClock } from "react-icons/fi";
+import { FiUsers, FiShoppingCart, FiClock } from "react-icons/fi";
 import { FaDollarSign } from "react-icons/fa";
 import AdminSidebar from "@/components/Admin/AdminSidebar";
 
