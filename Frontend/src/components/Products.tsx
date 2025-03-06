@@ -39,7 +39,7 @@ export function Products() {
   const [searchQuery, setSearchQuery] = useState("")
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/get-all-products/")
+    fetch("http://127.0.0.1:8000/api/get_product/")
       .then((response) => response.json())
       .then((data) => setProducts(data.products || [])) // Handle empty response
       .catch((error) => console.error("Error fetching products:", error))
@@ -106,11 +106,11 @@ export function Products() {
           >
             <div className="relative mb-6">
               <div className="overflow-hidden rounded-[12px]">
-                <img
-                  src={product.product_data.thumbnail ? `data:image/jpeg;base64,${product.product_data.thumbnail}` : "/placeholder.svg"}
-                  alt={product.product_data.product_name}
-                  className="w-full h-[140px] object-cover transition-transform duration-300 hover:scale-125"
-                />
+              <img
+                src={`http://127.0.0.1:8000${product.product_data.thumbnail}`}
+                alt={product.product_data.product_name}
+                className="w-full h-40 object-cover rounded-lg"
+              />
               </div>
             </div>
             <div className="text-center mb-4">
