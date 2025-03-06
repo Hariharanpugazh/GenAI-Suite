@@ -386,9 +386,11 @@ def schedule_demo(chat_history):
     return get_next_response(), scheduling_data
             
 # ✅ **6. API Endpoint for Chatbot**
+
 @api_view(["POST"])
 def chatbot_view(request):
     global chat_history
+    print(chat_history)
     data_loaded.wait()
     query = request.data.get("query")
 
@@ -396,54 +398,53 @@ def chatbot_view(request):
         return JsonResponse({"error": "No query provided"}, status=400)
 
     try:
+        # Step 1: Store user query in chat history
         chat_history.append({"role": "user", "content": query})
 
-        # ✅ Check for ongoing scheduling process
-        scheduling_data = None
-        for msg in reversed(chat_history):
-            if "scheduling_data" in msg:
-                scheduling_data = msg["scheduling_data"]
-                break  # Get the latest scheduling data
+        # Step 2: Retrieve relevant knowledge
+        closest_knowledge_list = search_mongo_vector(query)
+        print(f"The response from MongoDB: {closest_knowledge_list}")
 
-        # ✅ Handle scheduling step-by-step
+        # Step 3: Generate a response using RAG
+        answer = generate_answer_with_rag(query, closest_knowledge_list, chat_history[-3:])
+        
+        # Step 4: Store assistant response
+        chat_history.append({"role": "assistant", "content": answer})
+
+        # Step 5: Trim chat history to last 3 messages
+        chat_history = chat_history[-3:]
+
+        # Step 6: Check for ongoing scheduling process
+        scheduling_data = next((msg["scheduling_data"] for msg in reversed(chat_history) if "scheduling_data" in msg), None)
+
         if scheduling_data:
-            schedule_result, scheduling_data = schedule_demo(chat_history[-20:])  # Last 20 messages
+            schedule_result, scheduling_data = schedule_demo(chat_history[-20:])
             chat_history.append({"role": "assistant", "content": schedule_result, "scheduling_data": scheduling_data})
 
-            # 🔹 If all details are collected, confirm scheduling
+            # Step 7: Confirm scheduling if all details are collected
             if "Is this correct?" in schedule_result:
-                if "yes" in query.lower():  # ✅ User confirms scheduling
+                if "yes" in query.lower():
                     confirmation_message = "✅ Successfully Scheduled! Thank you for agreeing."
                     chat_history.append({"role": "assistant", "content": confirmation_message})
                     return JsonResponse({"answer": confirmation_message})
-                else:  # ❌ User says "no" → Restart scheduling, but keep history
-                    # reset_message = "Okay, let's start over. What date works best for you? (YYYY-MM-DD)"
-                    # chat_history.append({"role": "assistant", "content": reset_message})
-                    # return JsonResponse({"answer": reset_message})
-                    generate_answer_with_rag(query, closest_knowledge_list, chat_history[-3:])  
+                else:
+                    return JsonResponse({"answer": "Scheduling restarted. Please provide details again."})
 
-            else:
-                return JsonResponse({"answer": schedule_result})
+            return JsonResponse({"answer": schedule_result})
 
-        else:
-            # 🔹 No scheduling in progress → Check intent
-            scheduling_intent = check_scheduling_intent(query, chat_history[-20:])
+        # Step 8: Detect scheduling intent if no ongoing scheduling
+        scheduling_intent = check_scheduling_intent(query, chat_history[-20:])
+        if scheduling_intent == "yes":
+            schedule_question, schedule_data = schedule_demo(chat_history[-20:])
+            chat_history.append({"role": "assistant", "content": schedule_question, "scheduling_data": schedule_data})
+            return JsonResponse({"answer": schedule_question})
 
-            if scheduling_intent == "yes":
-                schedule_question, schedule_data = schedule_demo(chat_history[-20:])
-                chat_history.append({"role": "assistant", "content": schedule_question, "scheduling_data": schedule_data})
-                return JsonResponse({"answer": schedule_question})
-
-            else:
-                # 🔹 No scheduling intent detected → Use RAG-based response
-                closest_knowledge_list = search_mongo_vector(query)
-                answer = generate_answer_with_rag(query, closest_knowledge_list, chat_history[-3:])
-                chat_history.append({"role": "assistant", "content": answer})
-                chat_history = chat_history[-3:]  # Keep only last 3 messages
-                return JsonResponse({"answer": answer})
+        # Step 9: Return final response if no scheduling intent
+        return JsonResponse({"answer": answer})
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
     
 
 
