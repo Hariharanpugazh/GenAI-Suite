@@ -209,6 +209,7 @@ def request_appointment(request):
             phone_number = data.get('phoneNumber')
             appointment_date = data.get('appointmentDate')
             appointment_time = data.get('appointmentTime')
+            message = data.get('message')
 
             # Validate the data
             if not product_id:
@@ -230,10 +231,16 @@ def request_appointment(request):
             except ValueError:
                 return JsonResponse({'error': 'Invalid date format. Expected format: YYYY-MM-DD'}, status=400)
 
-            # Check if the appointment date and time are in the past
-            current_datetime = datetime.now()
-            if appointment_datetime < current_datetime:
-                return JsonResponse({'error': 'Appointment date and time cannot be in the past'}, status=400)
+            # Check if the appointment date is in the past
+            current_date = datetime.now().date()
+            if appointment_datetime.date() < current_date:
+                return JsonResponse({'error': 'Appointment date cannot be in the past'}, status=400)
+
+            # Convert the 24-hour time format to 12-hour format with AM/PM
+            try:
+                appointment_time_12hr = datetime.strptime(appointment_time, '%H:%M').strftime('%I:%M %p')
+            except ValueError:
+                return JsonResponse({'error': 'Invalid time format. Expected format: HH:MM'}, status=400)
 
             # Create a new appointment document
             appointment = {
@@ -242,7 +249,8 @@ def request_appointment(request):
                 'email': email,
                 'phone_number': phone_number,
                 'appointment_date': appointment_date,
-                'appointment_time': appointment_time,
+                'appointment_time': appointment_time_12hr,
+                'message': message,
             }
 
             # Insert the document into the appointments collection
