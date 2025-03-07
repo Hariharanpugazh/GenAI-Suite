@@ -13,6 +13,7 @@ const PostProduct: React.FC = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [userRole, setUserRole] = useState(null);
+  const [heading, setHeading] = useState("Create a New Product");
 
   // Product Information
   const [productName, setProductName] = useState("");
@@ -23,10 +24,22 @@ const PostProduct: React.FC = () => {
   const [thumbnail, setThumbnail] = useState<File | null>(null);
 
   // User Journey
-  const [userJourneys, setUserJourneys] = useState([{ journey: "", description: "" }]);
+  const [userJourneys, setUserJourneys] = useState([
+    { journey: "", description: "" },
+    { journey: "", description: "" },
+    { journey: "", description: "" },
+    { journey: "", description: "" }
+  ]);
 
   // Product Features
-  const [productFeatures, setProductFeatures] = useState([{ feature: "", description: "" }]);
+  const [productFeatures, setProductFeatures] = useState([
+    { feature: "", description: "" },
+    { feature: "", description: "" },
+    { feature: "", description: "" },
+    { feature: "", description: "" },
+    { feature: "", description: "" },
+    { feature: "", description: "" }
+  ]);
 
   const MAX_NAME_LENGTH = 50;
   const MAX_DESC_LENGTH = 300;
@@ -44,12 +57,43 @@ const PostProduct: React.FC = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (step === 2) {
+      setHeading("Enter User Journey");
+    } else if (step === 3) {
+      setHeading("Enter Product Features");
+    } else {
+      setHeading("Create a New Product");
+    }
+  }, [step]);
+
   // Handle adding/removing user journeys
   const addUserJourney = () => {
     if (userJourneys.length < 6) {
       setUserJourneys([...userJourneys, { journey: "", description: "" }]);
     }
   };
+
+
+  const getOrdinal = (num: number): string => {
+    if (num > 0) {
+      const lastDigit = num % 10;
+      const lastTwoDigits = num % 100;
+  
+      if (lastDigit === 1 && lastTwoDigits !== 11) {
+        return `${num}st`;
+      } else if (lastDigit === 2 && lastTwoDigits !== 12) {
+        return `${num}nd`;
+      } else if (lastDigit === 3 && lastTwoDigits !== 13) {
+        return `${num}rd`;
+      } else {
+        return `${num}th`;
+      }
+    }
+    return `${num}`;
+  };
+  
+
 
   const removeUserJourney = (index: number) => {
     setUserJourneys(userJourneys.filter((_, i) => i !== index));
@@ -129,7 +173,7 @@ const PostProduct: React.FC = () => {
       {userRole === "admin" && <AdminPageNavbar />}
       {userRole === "superadmin" && <SuperAdminPageNavbar />}
       <div className="p-6 w-full my-8 mx-16">
-        <h2 className="text-2xl font-bold">Create a New Product</h2>
+        <h2 className="text-2xl font-bold">{heading}</h2>
         <h5 className="text-lg font-thin mt-8 opacity-60"> Effortlessly add new products to your platform by providing key details such as name, description, template type, and resources. Customize product settings and ensure seamless integration into the marketplace.</h5>
         <hr className="my-8 border-black " />
 
@@ -160,7 +204,7 @@ const PostProduct: React.FC = () => {
             <div className="relative w-full h-40 pr-3 mt-5">
               <textarea
                 className="w-full m-0.5 p-2 rounded-md bg-white relative z-10 focus:outline-none resize-none h-32"
-                placeholder="Enter product name"
+                placeholder="Enter product description"
                 value={productDesc}
                 onChange={(e) => setProductDesc(e.target.value)}
                 maxLength={MAX_DESC_LENGTH}
@@ -243,64 +287,96 @@ const PostProduct: React.FC = () => {
           </>
         )}
 
-        {step === 2 && (
-          <>
-            <h3 className="text-lg font-semibold">Enter User Journey:</h3>
-            {userJourneys.map((uj, index) => (
-              <div key={index} className="mt-4">
-                <input
-                  type="text"
-                  className="w-full border p-2 rounded-md"
-                  placeholder={`User Journey ${index + 1}`}
-                  value={uj.journey}
-                  onChange={(e) => {
-                    const updated = [...userJourneys];
-                    updated[index].journey = e.target.value;
-                    setUserJourneys(updated);
-                  }}
-                />
-                <textarea
-                  className="w-full border p-2 rounded-md mt-2"
-                  placeholder="Description"
-                  value={uj.description}
-                  onChange={(e) => {
-                    const updated = [...userJourneys];
-                    updated[index].description = e.target.value;
-                    setUserJourneys(updated);
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => removeUserJourney(index)}
-                  className="text-red-500 mt-2"
-                >
-                  Remove
-                </button>
-              </div>
-            ))}
-            <button
-              onClick={addUserJourney}
-              disabled={userJourneys.length >= 6}
-              className="bg-gray-500 text-white px-4 py-2 rounded-lg mt-2"
-            >
-              + Add More
-            </button>
-            <div className="flex justify-between mt-6">
-              <button
-                onClick={() => setStep(1)}
-                className="bg-gray-400 text-white px-4 py-2 rounded-lg"
-              >
-                Back
-              </button>
-              <button
-                onClick={() => setStep(3)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg"
-              >
-                Next
-              </button>
-            </div>
-          </>
-        )}
+{step === 2 && (
+  <>
+    {userJourneys.map((uj, index) => (
+      <div key={index} className="mt-4">
+        <div className="flex items-center mb-2">
+          <span className="font-bold mr-2">{index + 1}</span>
+          <label className="block text-xl font-semibold">
+            Enter {getOrdinal(index + 1)} User Journey:*
+          </label>
+        </div>
+        <label className="block text-md opacity-60 font-thin my-3">
+          Give your product a unique and descriptive name that reflects its purpose and value.
+        </label>
+        <div className="relative w-96 pr-3" style={{ width: '35.3rem' }}>
+          <input
+            type="text"
+            className="w-full m-0.5 p-2 rounded-md bg-white relative z-10 focus:outline-none"
+            placeholder={`Enter ${getOrdinal(index + 1)} User Journey`}
+            value={uj.journey}
+            onChange={(e) => {
+              const updated = [...userJourneys];
+              updated[index].journey = e.target.value;
+              setUserJourneys(updated);
+            }}
+          />
+          <div className="absolute inset-0 rounded-md p-[1px] bg-gradient-to-r from-[#0795D4] via-[#DD0808] to-[#2606B3] opacity-50">
+            <div className="w-full h-full bg-white rounded-md"></div>
+          </div>
+        </div>
+
+        <div className="flex items-center mt-8 mb-2">
+          
+          <label className="block text-xl font-semibold">
+            Enter Description for {getOrdinal(index + 1)} User Journey:*
+          </label>
+        </div>
+        <label className="block text-md opacity-60 font-thin my-3">
+          Provide a detailed description for this user journey.
+        </label>
+        <div className="relative w-full h-40 pr-3 mt-5">
+          <textarea
+            className="w-full m-0.5 p-2 rounded-md bg-white relative z-10 focus:outline-none resize-none h-32"
+            placeholder={`Description for ${getOrdinal(index + 1)} User Journey`}
+            value={uj.description}
+            onChange={(e) => {
+              const updated = [...userJourneys];
+              updated[index].description = e.target.value;
+              setUserJourneys(updated);
+            }}
+          />
+          <div className="absolute inset-0 rounded-md p-[1px] bg-gradient-to-r from-[#0795D4] via-[#DD0808] to-[#2606B3] opacity-50">
+            <div className="w-full h-full bg-white rounded-md"></div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => removeUserJourney(index)}
+          className="text-red-500 mt-2"
+        >
+          Remove
+        </button>
+      </div>
+    ))}
+    <button
+      onClick={addUserJourney}
+      disabled={userJourneys.length >= 6}
+      className="bg-gray-500 text-white px-4 py-2 rounded-lg mt-2"
+    >
+      + Add More
+    </button>
+    <div className="flex justify-between mt-6">
+      <button
+        onClick={() => setStep(1)}
+        className="bg-gray-400 text-white px-4 py-2 rounded-lg"
+      >
+        Back
+      </button>
+      <button
+        onClick={() => setStep(3)}
+        className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+      >
+        Next
+      </button>
+    </div>
+  </>
+)}
+
+
+
 
         {step === 3 && (
           <>
