@@ -11,6 +11,7 @@ urlpatterns = [
     path("forgot_password/", forgot_password, name="forgot_password"),
     path("verify_reset_token/", verify_reset_token, name="verify_reset_token"),
     path("reset_password/", reset_password, name="reset_password"),
+    path("request_appointment/", request_appointment, name="request_appointment"),
 
     #ADMIN
     path("admin_signup/", admin_signup, name="admin_signup"),
@@ -25,6 +26,7 @@ urlpatterns = [
 
     #PRODUCTS
     path("post_product/", post_product, name="post_product"),
+    path('get_product/', get_products, name="get_product"),
     path('get-all-products/',get_all_products, name="get_all_products"),
     
     #CHATBOT

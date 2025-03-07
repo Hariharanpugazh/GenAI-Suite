@@ -14,6 +14,9 @@ import base64
 import tempfile
 import os , subprocess
 import traceback , gridfs
+import re
+from django.conf import settings
+
 # JWT Configuration
 JWT_SECRET = "secret"
 JWT_ALGORITHM = "HS256"
@@ -163,94 +166,156 @@ def superadmin_login(request):
 
 #===================================================P  R   O   D   U   C   T   S=====================================================================
 
-fs = gridfs.GridFS(db)
+# fs = gridfs.GridFS(db)
+
+# @csrf_exempt
+# def post_product(request):
+#     if request.method == "POST":
+#         try:
+#             data = json.loads(request.POST.get("data", "{}"))  # Extract JSON data
+#             demo_video = request.FILES.get("demo_video")
+#             screenshot = request.FILES.get("screenshot")
+#             thumbnail = request.FILES.get("thumbnail")
+
+#             role = data.get("role")
+#             userid = data.get("userId")
+
+#             # Auto-approval logic for admin
+#             auto_approval_setting = superadmin_collection.find_one({"key": "auto_approval"})
+#             is_auto_approval = auto_approval_setting.get("value", False) if auto_approval_setting else False
+
+#             # Determine if product is published
+#             is_publish = True if role == "superadmin" or (role == "admin" and is_auto_approval) else None
+
+#             # Validate required fields
+#             required_fields = ["product_name", "product_description", "category"]
+#             for field in required_fields:
+#                 if field not in data or not data[field].strip():
+#                     return JsonResponse({"error": f"Missing required field: {field}"}, status=400)
+
+#             # Compress video if provided
+#             def compress_video(file):
+#                 with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_input, \
+#                      tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_output:
+#                     input_path = temp_input.name
+#                     output_path = temp_output.name
+
+#                     # Save the uploaded file to a temporary location
+#                     with open(input_path, 'wb') as f:
+#                         f.write(file.read())
+
+#                     # Run the ffmpeg command to compress the video
+#                     subprocess.run([
+#                         'ffmpeg', '-i', input_path, '-vf', 'scale=360:144', output_path
+#                     ], check=True)
+
+#                     return output_path
+
+#             compressed_video_path = compress_video(demo_video) if demo_video else None
+
+#             # Store files using GridFS
+#             def store_file_in_gridfs(file_path):
+#                 with open(file_path, "rb") as f:
+#                     file_id = fs.put(f)
+#                 return file_id
+
+#             video_file_id = store_file_in_gridfs(compressed_video_path) if compressed_video_path else None
+#             screenshot_file_id = store_file_in_gridfs(screenshot.temporary_file_path()) if screenshot else None
+#             thumbnail_file_id = store_file_in_gridfs(thumbnail.temporary_file_path()) if thumbnail else None
+
+#             # Extract user journey (up to 6) and product features (up to 8)
+#             user_journey = []
+#             for i in range(1, 7):  # Supports up to 6 journeys
+#                 journey_name = data.get(f"user_journey_{i}", "").strip()
+#                 journey_desc = data.get(f"user_journey_description_{i}", "").strip()
+#                 if journey_name and journey_desc:
+#                     user_journey.append({"journey_name": journey_name, "journey_description": journey_desc})
+
+#             product_features = []
+#             for i in range(1, 9):  # Supports up to 8 product features
+#                 feature_name = data.get(f"product_feature_{i}", "").strip()
+#                 feature_desc = data.get(f"product_feature_description_{i}", "").strip()
+#                 if feature_name and feature_desc:
+#                     product_features.append({"feature_name": feature_name, "feature_description": feature_desc})
+
+#             product_data = {
+#                 "product_name": data["product_name"],
+#                 "product_description": data["product_description"],
+#                 "category": data["category"],
+#                 "demo_video": video_file_id,
+#                 "screenshot": screenshot_file_id,
+#                 "thumbnail": thumbnail_file_id,
+#             }
+
+#             product_entry = {
+#                 "user_id": userid,
+#                 "product_data": product_data,
+#                 "user_journey": user_journey,
+#                 "product_features": product_features,
+#                 "created_by": "admin_id" if role == "admin" else "superadmin_id",
+#                 "is_publish": is_publish,
+#                 "created_at": datetime.now(timezone.utc),
+#                 "updated_at": datetime.now(timezone.utc),
+#             }
+
+#             # Insert into MongoDB
+#             products_collection.insert_one(product_entry)
+
+#             # Clean up temporary files
+#             if compressed_video_path and os.path.exists(compressed_video_path):
+#                 os.remove(compressed_video_path)
+
+#             return JsonResponse({"message": "Product created successfully, awaiting approval."}, status=200)
+
+#         except Exception as e:
+#             # Log the full traceback for better debugging
+#             traceback.print_exc()
+#             return JsonResponse({"error": str(e)}, status=500)
+
+#     return JsonResponse({"error": "Invalid request method. Only POST is allowed."}, status=405)
+
+# Ensure media directory exists
+MEDIA_ROOT = os.path.join(settings.BASE_DIR, 'media')
+os.makedirs(MEDIA_ROOT, exist_ok=True)
+
+def save_file_locally(file, file_name):
+    """Save uploaded file to the local media directory."""
+    file_path = os.path.join(MEDIA_ROOT, file_name)
+    with open(file_path, 'wb') as destination:
+        for chunk in file.chunks():
+            destination.write(chunk)
+    return f"/media/{file_name}"
 
 @csrf_exempt
 def post_product(request):
     if request.method == "POST":
         try:
-            data = json.loads(request.POST.get("data", "{}"))  # Extract JSON data
+            data = json.loads(request.POST.get("data", "{}"))
             demo_video = request.FILES.get("demo_video")
             screenshot = request.FILES.get("screenshot")
             thumbnail = request.FILES.get("thumbnail")
+            product_name = data.get("product_name", "Unknown_Product")
 
-            role = data.get("role")
-            userid = data.get("userId")
+            # Save files locally
+            video_url = save_file_locally(demo_video, f"{product_name}_demo_video.mp4") if demo_video else None
+            screenshot_url = save_file_locally(screenshot, f"{product_name}_screenshot.png") if screenshot else None
+            thumbnail_url = save_file_locally(thumbnail, f"{product_name}_thumbnail.png") if thumbnail else None
 
-            # Auto-approval logic for admin
-            auto_approval_setting = superadmin_collection.find_one({"key": "auto_approval"})
-            is_auto_approval = auto_approval_setting.get("value", False) if auto_approval_setting else False
-
-            # Determine if product is published
-            is_publish = True if role == "superadmin" or (role == "admin" and is_auto_approval) else None
-
-            # Validate required fields
-            required_fields = ["product_name", "product_description", "category"]
-            for field in required_fields:
-                if field not in data or not data[field].strip():
-                    return JsonResponse({"error": f"Missing required field: {field}"}, status=400)
-
-            # Compress video if provided
-            def compress_video(file):
-                with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_input, \
-                     tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_output:
-                    input_path = temp_input.name
-                    output_path = temp_output.name
-
-                    # Save the uploaded file to a temporary location
-                    with open(input_path, 'wb') as f:
-                        f.write(file.read())
-
-                    # Run the ffmpeg command to compress the video
-                    subprocess.run([
-                        'ffmpeg', '-i', input_path, '-vf', 'scale=360:144', output_path
-                    ], check=True)
-
-                    return output_path
-
-            compressed_video_path = compress_video(demo_video) if demo_video else None
-
-            # Store files using GridFS
-            def store_file_in_gridfs(file_path):
-                with open(file_path, "rb") as f:
-                    file_id = fs.put(f)
-                return file_id
-
-            video_file_id = store_file_in_gridfs(compressed_video_path) if compressed_video_path else None
-            screenshot_file_id = store_file_in_gridfs(screenshot.temporary_file_path()) if screenshot else None
-            thumbnail_file_id = store_file_in_gridfs(thumbnail.temporary_file_path()) if thumbnail else None
-
-            # Extract user journey (up to 6) and product features (up to 8)
-            user_journey = []
-            for i in range(1, 7):  # Supports up to 6 journeys
-                journey_name = data.get(f"user_journey_{i}", "").strip()
-                journey_desc = data.get(f"user_journey_description_{i}", "").strip()
-                if journey_name and journey_desc:
-                    user_journey.append({"journey_name": journey_name, "journey_description": journey_desc})
-
-            product_features = []
-            for i in range(1, 9):  # Supports up to 8 product features
-                feature_name = data.get(f"product_feature_{i}", "").strip()
-                feature_desc = data.get(f"product_feature_description_{i}", "").strip()
-                if feature_name and feature_desc:
-                    product_features.append({"feature_name": feature_name, "feature_description": feature_desc})
-
+            # Store product details in MongoDB
             product_data = {
-                "product_name": data["product_name"],
-                "product_description": data["product_description"],
-                "category": data["category"],
-                "demo_video": video_file_id,
-                "screenshot": screenshot_file_id,
-                "thumbnail": thumbnail_file_id,
+                "product_name": product_name,
+                "product_description": data.get("product_description", ""),
+                "category": data.get("category", ""),
+                "demo_video": video_url,
+                "screenshot": screenshot_url,
+                "thumbnail": thumbnail_url,
             }
 
             product_entry = {
-                "user_id": userid,
+                "user_id": data.get("userId"),
                 "product_data": product_data,
-                "user_journey": user_journey,
-                "product_features": product_features,
-                "created_by": "admin_id" if role == "admin" else "superadmin_id",
-                "is_publish": is_publish,
+                "created_by": "admin_id" if data.get("role") == "admin" else "superadmin_id",
+                "is_publish": True,
                 "created_at": datetime.now(timezone.utc),
                 "updated_at": datetime.now(timezone.utc),
             }
@@ -258,173 +323,25 @@ def post_product(request):
             # Insert into MongoDB
             products_collection.insert_one(product_entry)
 
-            # Clean up temporary files
-            if compressed_video_path and os.path.exists(compressed_video_path):
-                os.remove(compressed_video_path)
-
-            return JsonResponse({"message": "Product created successfully, awaiting approval."}, status=200)
+            return JsonResponse({"message": "Product created successfully."}, status=200)
 
         except Exception as e:
-            # Log the full traceback for better debugging
             traceback.print_exc()
             return JsonResponse({"error": str(e)}, status=500)
 
-    return JsonResponse({"error": "Invalid request method. Only POST is allowed."}, status=405)
-
-#Uploaded file will be stored in third-part website ( Go File )
-
-API_TOKEN = "I9bJJd3bM0RKonahK6wSM7IHhQjSMgo7" #sns innovation hub id acc
-HEADERS = {"Authorization": f"Bearer {API_TOKEN}"}
-ROOT_FOLDER_ID = "e07b72ba-8b87-4788-968c-0635188eb472"  # Correct root folder ID / sns ihub link / need to change dynamically in deployment
-
-def get_upload_server():
-    """Fetch the best GoFile server for uploading."""
-    url = "https://api.gofile.io/servers"
-    response = requests.get(url, headers=HEADERS)
-    data = response.json()
-
-    if data.get("status") == "ok" and "servers" in data["data"]:
-        return data["data"]["servers"][0]["name"]  # Get the first available server
-    else:
-        raise Exception("Failed to get an upload server:", data)
-
-def create_folder(folder_name):
-    """Create a folder on GoFile."""
-    url = "https://api.gofile.io/contents/createFolder"
-    data = {"folderName": folder_name, "parentFolderId": ROOT_FOLDER_ID}
-    response = requests.post(url, headers=HEADERS, json=data)
-    data = response.json()
-
-    # Debugging: Print the entire response to understand its structure
-    print("API Response:", data)
-
-    if data.get("status") == "ok":
-        folder_id = data["data"].get("id")
-        if folder_id:
-            print(f"Folder created successfully: {folder_id}")
-            return folder_id
-        else:
-            print("Folder creation response does not contain 'folderId'.")
-            return None
-    else:
-        print("Failed to create folder:", data)
-        return None
-
-def upload_file(file_path, folder_id):
-    """Upload a file to GoFile in a specific folder."""
-    try:
-        # Get upload server
-        server_name = get_upload_server()
-        upload_url = f"https://{server_name}.gofile.io/contents/uploadfile"
-
-        # File data
-        files = {"file": open(file_path, "rb")}
-        data = {"folderId": folder_id}
-
-        # Upload request
-        response = requests.post(upload_url, headers=HEADERS, files=files, data=data)
-        data = response.json()
-
-        if data.get("status") == "ok":
-            file_info = data["data"]
-
-            # Try getting the correct file link
-            file_link = file_info.get("directLink") or file_info.get("downloadPage")
-
-            if file_link:
-                print(f"File uploaded successfully: {file_link}")
-                return file_link
-            else:
-                print("Upload succeeded, but no direct link found.")
-                return None
-        else:
-            print("Upload failed:", data)
-            return None
-
-    except Exception as e:
-        print("Error:", str(e))
-        return None
+    return JsonResponse({"error": "Invalid request method."}, status=405)
 
 @csrf_exempt
-def post_products(request):
-    if request.method == "POST":
+def get_products(request):
+    """Retrieve all product details including file URLs from MongoDB."""
+    if request.method == "GET":
         try:
-            data = json.loads(request.POST.get("data", "{}"))  # Extract JSON data
-            demo_video = request.FILES.get("demo_video")
-            screenshot = request.FILES.get("screenshot")
-            thumbnail = request.FILES.get("thumbnail")
-
-            role = data.get("role")
-            userid = data.get("userId")
-
-            # Auto-approval logic for admin
-            auto_approval_setting = superadmin_collection.find_one({"key": "auto_approval"})
-            is_auto_approval = auto_approval_setting.get("value", False) if auto_approval_setting else False
-
-            # Determine if product is published
-            is_publish = True if role == "superadmin" or (role == "admin" and is_auto_approval) else None
-
-            # Validate required fields
-            required_fields = ["product_name", "product_description", "category"]
-            for field in required_fields:
-                if field not in data or not data[field].strip():
-                    return JsonResponse({"error": f"Missing required field: {field}"}, status=400)
-
-            # Create a folder for the upload
-            folder_name = f"Product_{data['product_name']}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
-            folder_id = create_folder(folder_name)
-
-            # Upload files to GoFile in the created folder and get URLs
-            video_url = upload_file(demo_video.temporary_file_path(), folder_id) if demo_video else None
-            screenshot_url = upload_file(screenshot.temporary_file_path(), folder_id) if screenshot else None
-            thumbnail_url = upload_file(thumbnail.temporary_file_path(), folder_id) if thumbnail else None
-
-            # Extract user journey (up to 6) and product features (up to 8)
-            user_journey = []
-            for i in range(1, 7):  # Supports up to 6 journeys
-                journey_name = data.get(f"user_journey_{i}", "").strip()
-                journey_desc = data.get(f"user_journey_description_{i}", "").strip()
-                if journey_name and journey_desc:
-                    user_journey.append({"journey_name": journey_name, "journey_description": journey_desc})
-
-            product_features = []
-            for i in range(1, 9):  # Supports up to 8 product features
-                feature_name = data.get(f"product_feature_{i}", "").strip()
-                feature_desc = data.get(f"product_feature_description_{i}", "").strip()
-                if feature_name and feature_desc:
-                    product_features.append({"feature_name": feature_name, "feature_description": feature_desc})
-
-            product_data = {
-                "product_name": data["product_name"],
-                "product_description": data["product_description"],
-                "category": data["category"],
-                "demo_video": video_url,
-                "screenshot": screenshot_url,
-                "thumbnail": thumbnail_url,
-            }
-
-            product_entry = {
-                "user_id": userid,
-                "product_data": product_data,
-                "user_journey": user_journey,
-                "product_features": product_features,
-                "created_by": "admin_id" if role == "admin" else "superadmin_id",
-                "is_publish": is_publish,
-                "created_at": datetime.now(timezone.utc),
-                "updated_at": datetime.now(timezone.utc),
-            }
-
-            # Insert into MongoDB
-            products_collection1.insert_one(product_entry)
-
-            return JsonResponse({"message": "Product created successfully, awaiting approval."}, status=200)
-
+            products = list(products_collection.find({}, {"_id": 0}))
+            return JsonResponse({"message": "Products retrieved successfully.", "products": products}, status=200)
         except Exception as e:
-            # Log the full traceback for better debugging
             traceback.print_exc()
             return JsonResponse({"error": str(e)}, status=500)
-
-    return JsonResponse({"error": "Invalid request method. Only POST is allowed."}, status=405)
+    return JsonResponse({"error": "Invalid request method."}, status=405)
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
