@@ -19,6 +19,7 @@ const PostProduct: React.FC = () => {
   const [userRole, setUserRole] = useState(null);
   const [heading, setHeading] = useState("Create a New Product");
 
+
   // Product Information
   const [productName, setProductName] = useState("");
   const [productDesc, setProductDesc] = useState("");
@@ -35,6 +36,7 @@ const PostProduct: React.FC = () => {
     { journey: "", description: "" }
   ]);
 
+
   // Product Features
   const [productFeatures, setProductFeatures] = useState([
     { feature: "", description: "" },
@@ -44,6 +46,7 @@ const PostProduct: React.FC = () => {
     { feature: "", description: "" },
     { feature: "", description: "" }
   ]);
+
 
   const MAX_NAME_LENGTH = 50;
   const MAX_DESC_LENGTH = 300;
@@ -60,6 +63,16 @@ const PostProduct: React.FC = () => {
       setUserRole(payload.role); // Set the user role
     }
   }, []);
+
+  useEffect(() => {
+    if (step === 2) {
+      setHeading("Enter User Journey");
+    } else if (step === 3) {
+      setHeading("Enter Product Features");
+    } else {
+      setHeading("Create a New Product");
+    }
+  }, [step]);
 
   useEffect(() => {
     if (step === 2) {
@@ -176,6 +189,7 @@ const PostProduct: React.FC = () => {
       {userRole === "admin" && <AdminPageNavbar />}
       {userRole === "superadmin" && <SuperAdminPageNavbar />}
       <div className="p-6 w-full my-8 mx-16">
+        <h2 className="text-2xl font-bold">{heading}</h2>
         <h2 className="text-2xl font-bold">{heading}</h2>
         <h5 className="text-lg font-thin mt-8 opacity-60"> Effortlessly add new products to your platform by providing key details such as name, description, template type, and resources. Customize product settings and ensure seamless integration into the marketplace.</h5>
         <hr className="my-8 border-black " />
