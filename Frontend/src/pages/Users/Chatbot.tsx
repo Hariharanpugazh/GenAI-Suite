@@ -20,7 +20,7 @@ import axios from "axios";
 export default function Chatbot() {
   const [messages, setMessages] = useState([
   ]);
-  const [input, setInput] = useState("Hi Gen AI Suite! How can you help me?");
+  const [input, setInput] = useState("Hi Gen AI Suite!");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {

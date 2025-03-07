@@ -1,9 +1,9 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Search, SlidersHorizontal } from "lucide-react"
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
 
 interface Product {
   user_id: string
@@ -13,8 +13,8 @@ interface Product {
     category: string
     demo_video?: string
     screenshot?: string
-    thumbnail?: string // Base64 encoded image
-  }
+    thumbnail?: string
+    }
   user_journey?: { journey_name: string; journey_description: string }[]
   product_features?: { feature_name: string; feature_description: string }[]
   created_by: string
@@ -37,11 +37,20 @@ export function Products() {
   const [products, setProducts] = useState<Product[]>([])
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phoneNumber: "",
+    appointmentDate: new Date(),
+    appointmentTime: "",
+  })
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/get_product/")
       .then((response) => response.json())
-      .then((data) => setProducts(data.products || [])) // Handle empty response
+      .then((data) => setProducts(data.products || [])) 
       .catch((error) => console.error("Error fetching products:", error))
   }, [])
 
@@ -58,6 +67,38 @@ export function Products() {
 
     return matchesFilter && matchesSearch
   })
+
+  const handleTryNowClick = (product: Product) => {
+    setSelectedProduct(product)
+    setIsModalOpen(true)
+  }
+
+  const handleRequestDemo = () => {
+  const formattedDate = formData.appointmentDate.toISOString().split('T')[0]; 
+
+  fetch("http://127.0.0.1:8000/api/request_appointment/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      product_id: selectedProduct?.user_id,
+      name: formData.name,
+      email: formData.email,
+      phoneNumber: formData.phoneNumber,
+      appointmentDate: formattedDate, 
+      appointmentTime: formData.appointmentTime,
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Success:", data);
+      setIsModalOpen(false);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+};
 
   return (
     <main className="container mx-auto px-32 pb-12">
@@ -118,7 +159,10 @@ export function Products() {
               <p className="text-[12px] text-[#64748b] leading-relaxed">{product.product_data.product_description}</p>
             </div>
             <div className="flex justify-center gap-2">
-              <button className="px-3 py-1 bg-black text-white text-[12px] rounded-full border border-black hover:bg-white hover:text-black">
+              <button
+                className="px-3 py-1 bg-black text-white text-[12px] rounded-full border border-black hover:bg-white hover:text-black"
+                onClick={() => handleTryNowClick(product)}
+              >
                 Try now
               </button>
               <button className="px-3 py-1 bg-white text-black text-[12px] rounded-full border border-[#e2e8f0] hover:bg-black hover:text-white transition-colors">
@@ -128,6 +172,90 @@ export function Products() {
           </div>
         ))}
       </div>
+
+      {isModalOpen && (
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="bg-white rounded-lg p-8 w-96">
+          <h2 className="text-xl font-semibold mb-4">Request a Demo</h2>
+          <form>
+            <div className="mb-4">
+              <label className="block text-gray-700">Name</label>
+              <Input
+                type="text"
+                placeholder="Your name"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 mt-1"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700">Email</label>
+              <Input
+                type="email"
+                placeholder="Your email"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 mt-1"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700">Phone Number</label>
+              <Input
+                type="tel"
+                placeholder="Your phone number"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 mt-1"
+                value={formData.phoneNumber}
+                onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700">Appointment Date</label>
+              <DatePicker
+                selected={formData.appointmentDate}
+                onChange={(date) => {
+                  setFormData({ ...formData, appointmentDate: date as Date });
+                }}
+                minDate={new Date()}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 mt-1"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700">Appointment Time</label>
+              <select
+                className="w-full border border-gray-300 rounded-md px-3 py-2 mt-1"
+                value={formData.appointmentTime}
+                onChange={(e) => setFormData({ ...formData, appointmentTime: e.target.value })}
+              >
+                <option value="">Select a time</option>
+                <option value="10:00 - 11:00">10:00 - 11:00</option>
+                <option value="11:00 - 12:00">11:00 - 12:00</option>
+                <option value="12:00 - 13:00">12:00 - 13:00</option>
+                <option value="13:00 - 14:00">13:00 - 14:00</option>
+                <option value="14:00 - 15:00">14:00 - 15:00</option>
+                <option value="15:00 - 16:00">15:00 - 16:00</option>
+                <option value="16:00 - 17:00">16:00 - 17:00</option>
+              </select>
+            </div>
+            <div className="flex justify-between">
+              <Button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 bg-gray-300 text-black rounded-full hover:bg-gray-400"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleRequestDemo}
+                className="px-4 py-2 bg-black text-white rounded-full hover:bg-gray-800"
+              >
+                Book an Appointment
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )}
     </main>
   )
 }
