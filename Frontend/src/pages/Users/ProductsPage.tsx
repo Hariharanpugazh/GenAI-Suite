@@ -5,6 +5,7 @@ import { ProductHeroSection } from "@/components/ProductHeroSection"
 import { UserJourney } from "@/components/UserJourney"
 import { Features } from "@/components/Features"
 import { ImageSlider } from "@/components/ImageSlider"
+import Chatbot from "@/pages/Users/Chatbot"; // Import the Chatbot component
 
 export default function ProductsList() {
   return (
@@ -16,6 +17,7 @@ export default function ProductsList() {
       <UserJourney/>
       <Features/>
       <Footer/>
+      <Chatbot /> 
     </>
   )
 }
