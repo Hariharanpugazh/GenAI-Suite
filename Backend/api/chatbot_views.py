@@ -210,12 +210,12 @@ def search_mongo_vector(query, top_k=3):
                 unique_contents.append(content)
                 seen_contents.add(content)
 
+        print(f"✅ Final Extracted Knowledge: {unique_contents}")
         return unique_contents
 
     except Exception as e:
         print(f"❌ Vector search error: {e}")
         return []
-
 
 # ✅ **4. Generate Answer with Gemini**
 def generate_answer_with_rag(query, closest_knowledge_list, chat_history):
@@ -280,8 +280,6 @@ def generate_answer_with_rag(query, closest_knowledge_list, chat_history):
         except Exception as e:
             print(f"❌ Gemini API Error: {e}")
             return "Sry , Currently we seem a overloading , try again later !!"
-
-
             
 # ✅ **6. API Endpoint for Chatbot**
 @api_view(["POST"])
@@ -341,11 +339,6 @@ def chatbot_view(request):
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
-
-    
-
-
-
 
 # MongoDB connection
 scheduled_demos_collection = db["scheduled_demos"]
@@ -513,8 +506,6 @@ def check_scheduling_intent(query, chat_history):
         print(f"❌ Scheduling Intent API Error: {e}")
         return "no"
 
-
-
 # ✅ **5. New Function to Handle Scheduling**
 def schedule_demo(chat_history):
     """Handles the scheduling of a demo with natural language understanding."""
@@ -675,11 +666,7 @@ def schedule_demo(chat_history):
     
     # Get next response for current state
     return get_next_response(), scheduling_data
-
-
     
 # ✅ **7. Load Data on Startup (Runs in Background)**
 loading_thread = threading.Thread(target=store_embeddings_in_mongo, daemon=True)
 loading_thread.start()
-
-

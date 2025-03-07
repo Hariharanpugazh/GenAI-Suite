@@ -18,6 +18,8 @@ JWT_ALGORITHM = "HS256"
 client = MongoClient("mongodb+srv://ihub:ihub@cce.ksniz.mongodb.net/")
 db = client["GENAI"]
 user_collection = db["users"]
+appointments_collection = db['appointments']
+
 
 # Generate JWT Token
 def generate_tokens(user_id, name, role):
@@ -192,3 +194,67 @@ def get_all_products(request):
     except Exception as e:
         return Response({"error": str(e)}, status=500)
 
+@csrf_exempt
+def request_appointment(request):
+    if request.method == 'POST':
+        try:
+            # Parse the JSON data from the request body
+            data = json.loads(request.body)
+            print("Received data:", data)  # Debugging: Log the received data
+
+            # Extract the data
+            product_id = data.get('product_id')
+            name = data.get('name')
+            email = data.get('email')
+            phone_number = data.get('phoneNumber')
+            appointment_date = data.get('appointmentDate')
+            appointment_time = data.get('appointmentTime')
+
+            # Validate the data
+            if not product_id:
+                return JsonResponse({'error': 'Missing product_id'}, status=400)
+            if not name:
+                return JsonResponse({'error': 'Missing name'}, status=400)
+            if not email:
+                return JsonResponse({'error': 'Missing email'}, status=400)
+            if not phone_number:
+                return JsonResponse({'error': 'Missing phoneNumber'}, status=400)
+            if not appointment_date:
+                return JsonResponse({'error': 'Missing appointmentDate'}, status=400)
+            if not appointment_time:
+                return JsonResponse({'error': 'Missing appointmentTime'}, status=400)
+
+            # Convert appointment_date to a datetime object
+            try:
+                appointment_datetime = datetime.strptime(appointment_date, '%Y-%m-%d')
+            except ValueError:
+                return JsonResponse({'error': 'Invalid date format. Expected format: YYYY-MM-DD'}, status=400)
+
+            # Check if the appointment date and time are in the past
+            current_datetime = datetime.now()
+            if appointment_datetime < current_datetime:
+                return JsonResponse({'error': 'Appointment date and time cannot be in the past'}, status=400)
+
+            # Create a new appointment document
+            appointment = {
+                'product_id': product_id,
+                'name': name,
+                'email': email,
+                'phone_number': phone_number,
+                'appointment_date': appointment_date,
+                'appointment_time': appointment_time,
+            }
+
+            # Insert the document into the appointments collection
+            appointments_collection.insert_one(appointment)
+
+            # Return a success response
+            return JsonResponse({'success': 'Appointment requested successfully'})
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        except Exception as e:
+            print("Error:", str(e))  # Debugging: Log the error
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
