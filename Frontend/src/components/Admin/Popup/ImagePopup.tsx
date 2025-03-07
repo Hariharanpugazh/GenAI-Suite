@@ -137,7 +137,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({ isOpen, onClose, on
           </div>
           <div className="text-left">
             <p className="font-medium text-lg">Uploaded Images:</p>
-            <div className=" grid grid-cols-2 gap-4 " style={{ maxHeight: "10rem", overflowY: "auto" }}>
+            <div className="grid grid-cols-2 gap-4" style={{ maxHeight: "10rem", overflowY: "auto" }}>
               {uploadedFiles.map((file, index) => (
                 <div key={index} className="bg-white shadow-lg p-4 rounded-md mb-2">
                   <div className="flex justify-between items-center">

@@ -8,6 +8,10 @@ import AdminPageNavbar from "@/components/Admin/AdminSidebar"; // Import AdminPa
 import SuperAdminPageNavbar from "@/components/Superadmin/SuperadminSidebar"; // Import SuperAdminPageNavbar
 import VideoUploadModal from "@/components/Admin/Popup/VideoPopup";
 import ImageUploadModal from "@/components/Admin/Popup/ImagePopup";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
+
+
 
 const PostProduct: React.FC = () => {
   const navigate = useNavigate();
@@ -74,12 +78,11 @@ const PostProduct: React.FC = () => {
     }
   };
 
-
   const getOrdinal = (num: number): string => {
     if (num > 0) {
       const lastDigit = num % 10;
       const lastTwoDigits = num % 100;
-  
+
       if (lastDigit === 1 && lastTwoDigits !== 11) {
         return `${num}st`;
       } else if (lastDigit === 2 && lastTwoDigits !== 12) {
@@ -92,11 +95,11 @@ const PostProduct: React.FC = () => {
     }
     return `${num}`;
   };
-  
-
 
   const removeUserJourney = (index: number) => {
-    setUserJourneys(userJourneys.filter((_, i) => i !== index));
+    if (index >= 4) {
+      setUserJourneys(userJourneys.filter((_, i) => i !== index));
+    }
   };
 
   const addProductFeature = () => {
@@ -291,16 +294,47 @@ const PostProduct: React.FC = () => {
   <>
     {userJourneys.map((uj, index) => (
       <div key={index} className="mt-4">
-        <div className="flex items-center mb-2">
-          <span className="font-bold mr-2">{index + 1}</span>
-          <label className="block text-xl font-semibold">
-            Enter {getOrdinal(index + 1)} User Journey:*
-          </label>
-        </div>
-        <label className="block text-md opacity-60 font-thin my-3">
+<div className="flex items-center mb-2">
+  <div
+    className={`rounded-full h-8 w-8 mr-2 flex items-center justify-center text-white`}
+    style={{
+      background:
+        index === 0
+          ? "linear-gradient(to bottom, #3006B2, #A78BFF)"
+          : index === 1
+          ? "linear-gradient(to bottom, #DE0739, #FF90AA)"
+          : index === 2
+          ? "linear-gradient(to bottom, #F55A06, #FFB78F)"
+          : index === 3
+          ? "linear-gradient(to bottom, #FDC500, #FFE793)"
+          : index === 4
+          ? "linear-gradient(to bottom, #9EB105, #F3FF92)"
+          : index === 5
+          ? "linear-gradient(to bottom, #53AF01, #C6FF93)"
+          : "linear-gradient(to bottom, #9EB105, #F3FF92)"
+    }}
+  >
+    <span className="font-bold">{index + 1}</span>
+  </div>
+  <label className="block text-xl font-semibold">
+    Enter {getOrdinal(index + 1)} User Journey:*
+  </label>
+
+  {index >= 4 && (
+    <button
+      type="button"
+      onClick={() => removeUserJourney(index)}
+      className="text-gray-600 hover:text-red-600 mt-2 ml-auto"
+    >
+      <FontAwesomeIcon icon={faTimes} />
+    </button>
+  )}
+</div>
+
+        <label className="block text-md opacity-60 ml-10 font-thin my-3">
           Give your product a unique and descriptive name that reflects its purpose and value.
         </label>
-        <div className="relative w-96 pr-3" style={{ width: '35.3rem' }}>
+        <div className="relative w-96 ml-10 pr-3" style={{ width: '35.3rem' }}>
           <input
             type="text"
             className="w-full m-0.5 p-2 rounded-md bg-white relative z-10 focus:outline-none"
@@ -318,15 +352,14 @@ const PostProduct: React.FC = () => {
         </div>
 
         <div className="flex items-center mt-8 mb-2">
-          
-          <label className="block text-xl font-semibold">
+          <label className="block ml-10 text-xl font-semibold">
             Enter Description for {getOrdinal(index + 1)} User Journey:*
           </label>
         </div>
-        <label className="block text-md opacity-60 font-thin my-3">
+        <label className="block ml-10 text-md opacity-60 font-thin my-3">
           Provide a detailed description for this user journey.
         </label>
-        <div className="relative w-full h-40 pr-3 mt-5">
+        <div className="relative ml-10 w-full h-40 pr-3 mt-5">
           <textarea
             className="w-full m-0.5 p-2 rounded-md bg-white relative z-10 focus:outline-none resize-none h-32"
             placeholder={`Description for ${getOrdinal(index + 1)} User Journey`}
@@ -341,24 +374,17 @@ const PostProduct: React.FC = () => {
             <div className="w-full h-full bg-white rounded-md"></div>
           </div>
         </div>
-
-        <button
-          type="button"
-          onClick={() => removeUserJourney(index)}
-          className="text-red-500 mt-2"
-        >
-          Remove
-        </button>
       </div>
     ))}
+    
+    <div className="flex justify-between mt-6 ml-10">
     <button
       onClick={addUserJourney}
       disabled={userJourneys.length >= 6}
-      className="bg-gray-500 text-white px-4 py-2 rounded-lg mt-2"
+      className="bg-white text-black border font-bold border-black px-4 py-1 rounded-md mt-2"
     >
-      + Add More
+      Add User Journey +
     </button>
-    <div className="flex justify-between mt-6">
       <button
         onClick={() => setStep(1)}
         className="bg-gray-400 text-white px-4 py-2 rounded-lg"
@@ -366,16 +392,21 @@ const PostProduct: React.FC = () => {
         Back
       </button>
       <button
-        onClick={() => setStep(3)}
-        className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+        onClick={() => {
+          if (userJourneys.length >= 4) {
+            setStep(3);
+          } else {
+            toast.error("At least 4 user journeys are required.");
+          }
+        }}
+        className="bg-black text-white px-4 py-2 flex rounded-md"
       >
         Next
+        <img src="next.svg" alt="Upload Icon" className="ml-2 h-5 w-6 mt-1" />
       </button>
     </div>
   </>
 )}
-
-
 
 
         {step === 3 && (
