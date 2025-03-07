@@ -11,6 +11,7 @@ urlpatterns = [
     path("forgot_password/", forgot_password, name="forgot_password"),
     path("verify_reset_token/", verify_reset_token, name="verify_reset_token"),
     path("reset_password/", reset_password, name="reset_password"),
+    path("request_appointment/", request_appointment, name="request_appointment"),
 
     #ADMIN
     path("admin_signup/", admin_signup, name="admin_signup"),
