@@ -143,7 +143,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({ isOpen, onClose, on
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
                       <img src="Image.svg" alt="Image Icon" />
-                      <p className="text-black truncate ml-2 max-w-xs">{file.name}</p>
+                      <p className="text-black truncate ml-2  w-20">{file.name}</p>
                     </div>
                     <div className="flex items-center">
                       <p className="text-black text-xs block border p-0.5 border-gray-400 rounded mr-2">

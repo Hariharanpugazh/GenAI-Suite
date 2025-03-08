@@ -138,7 +138,7 @@ const VideoUploadModal: React.FC<VideoUploadModalProps> = ({ isOpen, onClose, on
                 <div className="flex justify-between items-center">
                   <div className="flex items-center">
                     <img src="Video.svg" alt="Video Icon" />
-                    <p className="text-black truncate ml-2 max-w-xs">{uploadedFile.name}</p>
+                    <p className="text-black truncate ml-2 w-96">{uploadedFile.name}</p>
                   </div>
                   <div className="flex items-center">
                     <p className="text-black text-xs block border p-0.5 border-gray-400 rounded mr-2">
